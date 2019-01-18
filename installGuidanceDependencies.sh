@@ -1,9 +1,10 @@
 #!/bin/bash
 
-sudo apt-get update && sudo apt-get install -y --no-install-recommends apt-utils vim && \
-sudo apt-get install -y --no-install-recommends r-base && \
-sudo apt-get remove -y g++ gcc && \
-sudo apt-get install -y --no-install-recommends g++-6 gcc-6 && \
+export DEBIAN_FRONTEND=noninteractive && \
+sudo -E apt-get update && sudo apt-get install -y --no-install-recommends apt-utils vim && \
+sudo -E apt-get install -y --no-install-recommends r-base && \
+sudo -E apt-get remove -y g++ gcc && \
+sudo -E apt-get install -y --no-install-recommends g++-6 gcc-6 && \
 sudo ln -sf /usr/bin/gcc-6 /usr/bin/gcc && \
 sudo ln -sf /usr/bin/g++-6 /usr/bin/g++ && \
 mkdir -p ~/TOOLS && \
@@ -13,7 +14,7 @@ tar zxvf qctool_v1.4-linux-x86_64.tgz && \
 rm qctool_v1.4-linux-x86_64.tgz && \
 chmod -R 755 ~/TOOLS/qctool_v1.4-linux-x86_64/ && \
 sudo ln -sf ~/TOOLS/qctool_v1.4-linux-x86_64/qctool /usr/bin/qctool1.4 && \
-sudo apt-get install -y --no-install-recommends zlib1g-dev libbz2-dev liblzma-dev && \
+sudo -E apt-get install -y --no-install-recommends zlib1g-dev libbz2-dev liblzma-dev && \
 wget https://github.com/samtools/bcftools/releases/download/1.8/bcftools-1.8.tar.bz2 -O bcftools.tar.bz2 && \
 tar -xjvf bcftools.tar.bz2 && \
 rm bcftools.tar.bz2 && \
@@ -22,7 +23,7 @@ make && \
 sudo make prefix=/usr/local/bin install && \
 sudo ln -sf /usr/local/bin/bin/bcftools /usr/bin/bcftools && \
 cd .. && \
-sudo apt-get install -y --no-install-recommends ncurses-dev && \
+sudo -E apt-get install -y --no-install-recommends ncurses-dev && \
 wget https://github.com/samtools/samtools/releases/download/1.5/samtools-1.5.tar.bz2 -O samtools.tar.bz2 && \
 tar -xjvf samtools.tar.bz2 && \
 rm samtools.tar.bz2 && \
@@ -30,7 +31,7 @@ cd samtools-1.5 && \
 make && \
 sudo make prefix=/usr/local/bin install && \
 sudo ln -sf /usr/local/bin/bin/samtools /usr/bin/samtools && \
-sudo apt-get install -y --no-install-recommends libblas-dev liblapack-dev libatlas-base-dev && \
+sudo -E apt-get install -y --no-install-recommends libblas-dev liblapack-dev libatlas-base-dev && \
 cd .. && \
 git clone https://github.com/chrchang/plink-ng.git && \
 cd plink-ng && \
@@ -57,7 +58,7 @@ chmod -R 755 ~/TOOLS/snptest_v2.5_linux_x86_64_static/ && \
 sudo ln -sf ~/TOOLS/snptest_v2.5_linux_x86_64_static/snptest_v2.5 /usr/bin/snptest_v2.5 && \
 git clone https://github.com/Santy-8128/Minimac3.git && \
 cd Minimac3 && \
-sudo apt-get install libssl-dev zlib1g-dev && \
+sudo -E apt-get install libssl-dev zlib1g-dev && \
 make && \
 sudo ln -sf ~/TOOLS/Minimac3/bin/Minimac3 /usr/bin/minimac3 && \
 cd ..
