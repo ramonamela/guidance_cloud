@@ -9,13 +9,6 @@ contains() {
     fi
 }
 
-## Bucket information  
-bucketLocation="us-east1"
-bucketProjectName="${project}"
-storageClass="regional"
-bucketName="bucket-${bucketProjectName}"
-zone=$(gcloud compute zones list | grep ${bucketLocation} | awk '{ print $1 }' | sort | head -n1)
-
 ## General information
 instanceUsername="guidanceproject2018"
 instanceName="guidancebase"
@@ -23,6 +16,15 @@ publicSSHfile="/home/ramela/.ssh/id_rsa.pub"
 projectName="guidance"
 identificationJson="/home/ramela/git/google_cloud/guidance-06986d1d6789.json"
 project="guidance"
+
+
+## Bucket information  
+bucketLocation="us-east1"
+bucketProjectName="${project}"
+storageClass="regional"
+bucketName="bucket-${bucketProjectName}"
+zone=$(gcloud compute zones list | grep ${bucketLocation} | awk '{ print $1 }' | sort | head -n1)
+
 
 ## Instance information
 baseInstanceName="guidancecluster"
@@ -32,6 +34,7 @@ memoryInstanceConfig="highcpu"
 ## St: 1 2 4 8 16 32 64 96
 ## High{Mem-Cpu}: 2 4 8 16 32 64 96
 cpuInstance="2"
+
 
 ## Snapshot name
 snapName="snap${project}"

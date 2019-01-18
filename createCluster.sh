@@ -18,6 +18,7 @@ for ((i=1;i<=index;++i)); do
     gcloud compute disks create ${currentName} --source-snapshot "${snapName}"
     echo gcloud compute instances create "${currentName}" --machine-type ${machineType} --service-account ${serviceAccount} --disk "name=${currentName},device-name=${currentName},mode=rw,boot=yes,auto-delete=yes"
     gcloud compute instances create "${currentName}" --machine-type ${machineType} --service-account ${serviceAccount} --disk "name=${currentName},device-name=${currentName},mode=rw,boot=yes,auto-delete=yes"
+    ./addPublicKeyGoogleCloud.sh ${currentName}
 done
 
 #gcloud compute disks create ${allNames} --source-snapshot "${snapName}" 
