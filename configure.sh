@@ -39,6 +39,8 @@ cpuInstance="2"
 ## Snapshot name
 snapName="snap${project}"
 
+## Cluster information
+amountOfNodes="3"
 
 #echo "## MEMORY OPTION ##"
 ## Param verification
