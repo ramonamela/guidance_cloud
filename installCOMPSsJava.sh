@@ -19,7 +19,6 @@ cat ~/.bashrc | grep -v JAVA_HOME > ~/newbashrc && mv ~/newbashrc ~/.bashrc && \
 echo "export JAVA_HOME=\"/usr/lib/jvm/java-8-openjdk-amd64/\"" >> ~/.bashrc && \
 cat ~/.bashrc && \
 export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/" && \
-echo "**************************************************************************************************${JAVA_HOME}" && \
 cd ~/2.4/builders && sudo -E ./buildlocal -M -B -A && cd -
 
 

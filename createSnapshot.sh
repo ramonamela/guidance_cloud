@@ -8,5 +8,8 @@ diskName=$(gcloud compute instances describe ${instanceName} | grep -A5 disk | g
 
 echo $diskName
 
+if gcloud compute snapshots list | grep -q ${snapName}; then
+    gcloud compute snapshots delete ${snapName} -q
+fi
 
 gcloud compute disks snapshot $diskName --snapshot-names ${snapName}
