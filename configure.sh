@@ -9,12 +9,14 @@ contains() {
     fi
 }
 
+currentFolder=$(pwd)
+
 ## General information
 instanceUsername="guidanceproject2018"
 instanceName="guidancebase"
-publicSSHfile="/home/ramela/.ssh/id_rsa.pub"
+publicSSHfile="${HOME}/.ssh/id_rsa.pub"
 projectName="guidance"
-identificationJson="/home/ramela/git/google_cloud/guidance-06986d1d6789.json"
+identificationJson="${currentFolder}/guidance-06986d1d6789.json"
 project="guidance"
 
 
