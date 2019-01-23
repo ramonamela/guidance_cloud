@@ -31,7 +31,7 @@ zone=$(gcloud compute zones list | grep ${bucketLocation} | awk '{ print $1 }' |
 ## Instance information
 baseInstanceName="guidancecluster"
 ## standard, highmem, highcpu
-memoryInstanceConfig="highcpu"
+memoryInstanceConfig="standard"
 #memoryInstanceConfig="standard"
 ## St: 1 2 4 8 16 32 64 96
 ## High{Mem-Cpu}: 2 4 8 16 32 64 96
