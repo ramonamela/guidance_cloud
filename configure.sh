@@ -35,14 +35,14 @@ memoryInstanceConfig="highcpu"
 #memoryInstanceConfig="standard"
 ## St: 1 2 4 8 16 32 64 96
 ## High{Mem-Cpu}: 2 4 8 16 32 64 96
-cpuInstance="2"
+cpuInstance="1"
 
 
 ## Snapshot name
 snapName="snap${project}"
 
 ## Cluster information
-amountOfNodes="3"
+amountOfNodes="2"
 
 #echo "## MEMORY OPTION ##"
 ## Param verification
