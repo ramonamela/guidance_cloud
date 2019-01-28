@@ -9,7 +9,8 @@ echo "Remove base instance"
 ./removeBaseInstance.sh
 
 echo "Create new base instance"
-gcloud compute instances create ${instanceName} --zone=${zone} --machine-type=${machineType} --image=ubuntu-minimal-1810-cosmic-v20190108 --image-project=ubuntu-os-cloud --boot-disk-type=pd-standard --boot-disk-size=10GB --boot-disk-device-name=${instanceName}
+serviceAccount=$(cat guidance-06986d1d6789.json | grep client_email | awk '{ print $2 }' | sed 's/\"//g' | sed 's/,//g')
+gcloud compute instances create ${instanceName} --zone=${zone} --machine-type=${machineType} --image=ubuntu-minimal-1810-cosmic-v20190108 --image-project=ubuntu-os-cloud --boot-disk-type=pd-standard --boot-disk-size=10GB --boot-disk-device-name=${instanceName} --service-account=${serviceAccount}
 
 echo "Add public key google cloud"
 ./addPublicKeyGoogleCloud.sh ${instanceName}

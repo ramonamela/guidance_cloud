@@ -6,6 +6,8 @@ source ./configure.sh
 
 ./createBaseInstance.sh
 
+./stopInstance.sh
+
 ./createSnapshot.sh
 
 serviceAccount=$(gcloud compute instances describe ${instanceName} | grep service | awk '{ print $3 }')
@@ -13,6 +15,7 @@ machineType=$(gcloud compute instances describe ${instanceName} | grep machine |
 
 for ((i=1;i<=amountOfNodes;++i)); do
     currentName="${baseInstanceName}$(printf %04d $i)"
+    ./removeDisk.sh ${currentName}
     gcloud compute disks create ${currentName} --source-snapshot "${snapName}"
     gcloud compute instances create "${currentName}" --machine-type ${machineType} --service-account ${serviceAccount} --disk "name=${currentName},device-name=${currentName},mode=rw,boot=yes,auto-delete=yes"
     ./addPublicKeyGoogleCloud.sh ${currentName}

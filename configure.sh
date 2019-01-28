@@ -31,11 +31,11 @@ zone=$(gcloud compute zones list | grep ${bucketLocation} | awk '{ print $1 }' |
 ## Instance information
 baseInstanceName="guidancecluster"
 ## standard, highmem, highcpu
-memoryInstanceConfig="standard"
+memoryInstanceConfig="highmem"
 #memoryInstanceConfig="standard"
 ## St: 1 2 4 8 16 32 64 96
 ## High{Mem-Cpu}: 2 4 8 16 32 64 96
-cpuInstance="1"
+cpuInstance="4"
 
 
 ## Snapshot name
@@ -52,20 +52,20 @@ then
     correctOptions="1 2 4 8 16 32 64 96"
 elif [ 0 == $(contains "highcpu highmem" "${memoryInstanceConfig}") ]
 then
-    #echo "High memory or high cpu"
+    echo "High memory or high cpu"
     correctOptions="2 4 8 16 32 64 96"
 else
-    #echo "Memory not recognized: ${memoryInstanceConfig}"
+    echo "Memory not recognized: ${memoryInstanceConfig}"
     exit 1
 fi
 
 #echo "## AMOUNT OF CPUs PER NODE"
 if [ 1 == $(contains "${correctOptions[@]}" "${cpuInstance}") ]
 then
-    #echo "Bad amount of CPUs: ${cpuInstance}"
+    echo "Bad amount of CPUs: ${cpuInstance}"
     exit 1
 else
-    #echo ${cpuInstance}
+    echo ${cpuInstance}
     true
 fi
 
