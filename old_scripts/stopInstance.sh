@@ -1,5 +1,5 @@
 #!/bin/bash
 
-source ./configure.sh
+source configure.sh
 
 gcloud compute instances stop "${instanceName}"

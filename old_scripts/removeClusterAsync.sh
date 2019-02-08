@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./configure.sh
+source configure.sh
 
 #serviceAccount=$(gcloud compute instances describe ${instanceName} | grep service | awk '{ print $3 }')
 #machineType=$(gcloud compute instances describe ${instanceName} | grep machine | awk '{ print $2 }' | tr "/" "\t" | awk '{ print $NF }')
@@ -15,7 +15,7 @@ source ./configure.sh
 
 for ((i=1;i<=amountOfNodes;++i)); do
     currentName="${baseInstanceName}$(printf %04d $i)"
-    ./removeInstance.sh ${currentName}
+    removeInstanceAsync.sh ${currentName}
     #gcloud compute instances delete ${currentName} -q
     #./removeDisk.sh ${currentName}
     #gcloud compute disks delete ${currentName} -q

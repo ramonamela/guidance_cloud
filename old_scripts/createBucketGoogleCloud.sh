@@ -2,7 +2,7 @@
 
 ## https://cloud.google.com/storage/docs/creating-buckets ##
 
-source ./configure.sh
+source configure.sh
 echo "${bucketProjectName}"
 echo "${storageClass}"
 echo "${bucketLocation}"

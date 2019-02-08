@@ -18,7 +18,7 @@ publicSSHfile="${HOME}/.ssh/id_rsa.pub"
 projectName="guidance"
 identificationJson="${currentFolder}/guidance-06986d1d6789.json"
 project="guidance"
-
+currentZone="us-east1-c"
 
 ## Bucket information  
 bucketLocation="us-east1"
@@ -26,6 +26,7 @@ bucketProjectName="${project}"
 storageClass="regional"
 bucketName="bucket-${bucketProjectName}"
 zone=$(gcloud compute zones list | grep ${bucketLocation} | awk '{ print $1 }' | sort | head -n1)
+zone=${currentZone}
 
 
 ## Instance information

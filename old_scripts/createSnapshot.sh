@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./configure.sh
+source configure.sh
 
 ## Get disk name
 #describeContent=$(gcloud compute instances describe ${instanceName})
