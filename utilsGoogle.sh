@@ -14,7 +14,7 @@ set -u # Exit when undefined variable
 #
 # Inits the GCloud session
 #
-initSession(){
+initSession() {
     local identification_json=${1}
     gcloud auth activate-service-account --key-file="${identification_json}"
 }
@@ -23,7 +23,7 @@ initSession(){
 #
 # Sets the GCloud project properties
 #
-setProjectProperties(){
+setProjectProperties() {
     local project_name=${1}
     local bucket_location=${2}
 
@@ -37,7 +37,7 @@ setProjectProperties(){
 #
 # Echoes the bucket location
 #
-getBucketLocation(){
+getBucketLocation() {
     local bucket_name=${1}
 
     local bucket_location
@@ -49,7 +49,7 @@ getBucketLocation(){
 #
 # Echoes the bucket zone
 #
-getBucketZone(){
+getBucketZone() {
     local bucket_name=${1}
 
     local bucket_zone
@@ -61,7 +61,7 @@ getBucketZone(){
 #
 # Checks if an instance exists. Echoes 0 if it exists, 1 otherwise
 #
-checkInstanceExistance(){
+checkInstanceExistance() {
     local instance_name=${1}
 
     gcloud compute instances list | grep -q "${instance_name}"
@@ -72,7 +72,7 @@ checkInstanceExistance(){
 #
 # Echoes the instance zone
 #
-getInstanceZone(){
+getInstanceZone() {
     local instance_name=${1}
 
     local instance_zone
@@ -84,7 +84,7 @@ getInstanceZone(){
 #
 # Removes the given instance
 #
-removeInstance(){
+removeInstance() {
     local instance_name=${1}
 
     local ie
@@ -100,7 +100,7 @@ removeInstance(){
 #
 # Echoes the service account
 #
-getServiceAccount(){
+getServiceAccount() {
     local identification_json=${1}
 
     local service_acc
@@ -113,7 +113,7 @@ getServiceAccount(){
 #
 # Adds a public key to an instance
 #
-addPublicKey(){
+addPublicKey() {
     local current_instance_name=${1}
     local current_zone=${2}
     local public_ssh_file=${3}
@@ -135,19 +135,17 @@ addPublicKey(){
 #
 # Put into CURRENT_IP the instance IP (so this can be used to get the IP of an instance assuming it is running)
 #
-waitUntilRunning(){
+waitUntilRunning() {
     local instance_name=${1}
     local instance_username=${2}
 
     CURRENT_IP=$(gcloud compute instances list --filter="${instance_name}" | tail -n1 | awk '{print $5}')
-    ssh -q -o "StrictHostKeyChecking no" "${instance_username}"@"${CURRENT_IP}" "exit"
-    ev=$?
+    ssh -q -o "StrictHostKeyChecking no" "${instance_username}"@"${CURRENT_IP}" "exit" || ev=$? && true
     while [ "${ev}" -ne 0 ]; do
         echo "Could not stablish connection with ${instance_username}@${CURRENT_IP}, retrying..."
         sleep 1s
         CURRENT_IP=$(gcloud compute instances list --filter="${instance_name}" | tail -n1 | awk '{print $5}')
-        ssh -q -o "StrictHostKeyChecking no" "${instance_username}"@"${CURRENT_IP}" "exit"
-        ev=$?
+        ssh -q -o "StrictHostKeyChecking no" "${instance_username}"@"${CURRENT_IP}" "exit" || ev=$? && true
     done
     echo "The image ${instance_username}@${CURRENT_IP} is already running"
 }
@@ -156,7 +154,7 @@ waitUntilRunning(){
 #
 # Creates a base instance
 #
-createBaseInstance(){
+createBaseInstance() {
     local instance_name=${1}
     local service_account=${2}
     local project_name=${3}

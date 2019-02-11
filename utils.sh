@@ -11,7 +11,7 @@ set -u # Exit when undefined variable
 # HELPER METHODS
 #
 
-installGuidanceDependenciesCommands(){
+installGuidanceDependenciesCommands() {
     # Disable interactive APT
     export DEBIAN_FRONTEND=noninteractive
 
@@ -137,7 +137,7 @@ installGuidanceDependenciesCommands(){
     cd -
 }
 
-installCOMPSsCommands(){
+installCOMPSsCommands() {
     # Disable interactive APT
     export DEBIAN_FRONTEND=noninteractive
 
@@ -189,7 +189,7 @@ installCOMPSsCommands(){
 # ENTRY POINTS
 #
 
-installGuidanceDependencies(){
+installGuidanceDependencies() {
     local username=${1}
     local ip=${2}
  
@@ -197,7 +197,7 @@ installGuidanceDependencies(){
     ssh -o "StrictHostKeyChecking no" "${username}"@"${ip}" "$(typeset -f); installGuidanceDependenciesCommands"
 }
 
-installCOMPSs(){
+installCOMPSs() {
     local username=${1}
     local ip=${2}
 

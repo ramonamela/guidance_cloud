@@ -55,7 +55,7 @@ loadEnv() {
     #createBaseInstance
 }
 
-createNewBaseInstance(){
+createNewBaseInstance() {
     # Creates a new base instance
     createBaseInstance "${BASE_INSTANCE_NAME}" "${service_account}" "${PROJECT_NAME}" "${bucket_zone}"
     # Set up public key
