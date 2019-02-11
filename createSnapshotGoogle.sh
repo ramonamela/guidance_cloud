@@ -93,6 +93,9 @@ main() {
 
     # Retrieve basic information
     echo "[INFO] Retrieving basic information..."
+    local bucket_localtion
+    local bucket_zone
+    local service_account
     bucket_location=$(getBucketLocation "${BUCKET_NAME}")
     bucket_zone=$(getBucketZone "${BUCKET_NAME}")
     service_account=$(getServiceAccount "${IDENTIFICATION_JSON}")

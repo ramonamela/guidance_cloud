@@ -133,9 +133,9 @@ addPublicKey() {
     gcloud compute instances describe "${current_instance_name}" --zone="${current_zone}" | grep ssh-rsa | xargs -i echo {} > "${pubkey_path}"
     current_public_key=$(cat "${public_ssh_file}")
     echo "${instance_username}:${current_public_key}" >> "${pubkey_path}"
-    gcloud compute instances add-metadata "${current_instance_name}" --metadata-from-file ssh-keys="/tmp/publicKeys${current_instance_name}.txt" --zone="${current_zone}"
+    gcloud compute instances add-metadata "${current_instance_name}" --metadata-from-file ssh-keys="${pubkey_path}" --zone="${current_zone}"
     gcloud compute instances start "${current_instance_name}" --zone="${current_zone}"
-    rm "${current_instance_name}"
+    rm "${pubkey_path}"
 }
 
 
@@ -167,10 +167,13 @@ createBaseInstance() {
     local project_name=${3}
     local current_zone=${4}
 
+    #local ubuntu_image="ubuntu-minimal-1810-cosmic-v20190122"
+    local ubuntu_image="ubuntu-minimal-1804-lts"
+
     gcloud compute instances create "${instance_name}" \
             --zone "${current_zone}" \
             --machine-type n1-standard-1 \
-            --image ubuntu-minimal-1810-cosmic-v20190122 \
+            --image "${ubuntu_image}" \
             --image-project ubuntu-os-cloud \
             --boot-disk-type pd-standard \
             --boot-disk-size 10GB \
