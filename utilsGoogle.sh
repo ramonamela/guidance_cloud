@@ -147,12 +147,11 @@ waitUntilRunning() {
     local instance_username=${2}
 
     CURRENT_IP=$(gcloud compute instances list --filter="${instance_name}" | tail -n1 | awk '{print $5}')
-    ssh -q -o "StrictHostKeyChecking no" "${instance_username}"@"${CURRENT_IP}" "exit" || ev=$? && true
-    while [ "${ev}" -ne 0 ]; do
+    while ! ssh -q -o "StrictHostKeyChecking no" "${instance_username}"@"${CURRENT_IP}" "exit"; do
         echo "Could not stablish connection with ${instance_username}@${CURRENT_IP}, retrying..."
         sleep 1s
         CURRENT_IP=$(gcloud compute instances list --filter="${instance_name}" | tail -n1 | awk '{print $5}')
-        ssh -q -o "StrictHostKeyChecking no" "${instance_username}"@"${CURRENT_IP}" "exit" || ev=$? && true
+        #ssh -q -o "StrictHostKeyChecking no" "${instance_username}"@"${CURRENT_IP}" "exit" || ev=$? && true
     done
     echo "The image ${instance_username}@${CURRENT_IP} is already running"
 }
@@ -167,8 +166,8 @@ createBaseInstance() {
     local project_name=${3}
     local current_zone=${4}
 
-    #local ubuntu_image="ubuntu-minimal-1810-cosmic-v20190122"
-    local ubuntu_image="ubuntu-minimal-1804-lts"
+    local ubuntu_image="ubuntu-minimal-1810-cosmic-v20190122"
+    #local ubuntu_image="ubuntu-minimal-1804-lts"
 
     gcloud compute instances create "${instance_name}" \
             --zone "${current_zone}" \

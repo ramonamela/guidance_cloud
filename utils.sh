@@ -12,13 +12,13 @@ set -u # Exit when undefined variable
 #
 
 installGuidanceDependenciesCommands() {
-    # Disable interactive APT
-    export DEBIAN_FRONTEND=noninteractive
+    # Enable error manager 
+    set -e
 
     # Install base dependencies
     sudo apt-get update
     sudo apt-get install -y --no-install-recommends apt-utils vim
-    sudo apt-get install -y --no-install-recommends r-base make git
+    sudo bash -c "export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends r-base make git"
     sudo apt-get remove -y g++ gcc
     sudo apt-get install -y --no-install-recommends g++-6 gcc-6
     sudo ln -sf /usr/bin/gcc-6 /usr/bin/gcc
@@ -138,8 +138,8 @@ installGuidanceDependenciesCommands() {
 }
 
 installCOMPSsCommands() {
-    # Disable interactive APT
-    export DEBIAN_FRONTEND=noninteractive
+    # Enable error manager
+    set -e
 
     # Clean APT
     sudo -E apt-get update
@@ -149,14 +149,14 @@ installCOMPSsCommands() {
     dpkg-query -W -f='${binary:Package}\n' | grep -E -e '^(ia32-)?(sun|oracle)-java' -e '^openjdk-' -e '^icedtea' -e '^(default|gcj)-j(re|dk)' -e '^gcj-(.*)-j(re|dk)' | xargs sudo apt-get -y remove
 
     # Install basic COMPSs dependencies
-    sudo -E apt-get -y --no-install-recommends install openjdk-8-jre openjdk-8-jdk
-    sudo -E apt-get -y --no-install-recommends install python
-    sudo -E apt-get -y --no-install-recommends install maven subversion
-    sudo -E apt-get -y --no-install-recommends install graphviz xdg-utils
-    sudo -E apt-get -y --no-install-recommends install libtool automake build-essential
-    sudo -E apt-get -y --no-install-recommends install openssh-server openssh-client
-    sudo -E apt-get -y --no-install-recommends install libxml2 libxml2-dev gfortran libpapi-dev papi-tools
-    sudo -E apt-get -y --no-install-recommends install openmpi-bin openmpi-doc libopenmpi-dev uuid-runtime curl bc git
+    sudo apt-get -y --no-install-recommends install openjdk-8-jre openjdk-8-jdk
+    sudo apt-get -y --no-install-recommends install python
+    sudo apt-get -y --no-install-recommends install maven subversion
+    sudo apt-get -y --no-install-recommends install graphviz xdg-utils
+    sudo apt-get -y --no-install-recommends install libtool automake build-essential
+    sudo bash -c "export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends openssh-server openssh-client"
+    sudo apt-get -y --no-install-recommends install libxml2 libxml2-dev gfortran libpapi-dev papi-tools
+    sudo apt-get -y --no-install-recommends install openmpi-bin openmpi-doc libopenmpi-dev uuid-runtime curl bc git
 
     # Download and Install COMPSs
     local compss_version="2.4"
