@@ -1,115 +1,174 @@
+#
+# BASH OPTIONS
+#
+
+set -e # Exit when command fails
+set -u # Exit when undefined variable                                                                                                                                                                                                     
+#set -x # Enable bash trace
+
+
+#
+# HELPER METHODS
+#
+
+#
+# Inits the GCloud session
+#
 initSession(){
-
-    local identificationJson=${1}
-
-    gcloud auth activate-service-account --key-file=${identificationJson}
+    local identification_json=${1}
+    gcloud auth activate-service-account --key-file="${identification_json}"
 }
 
+
+#
+# Sets the GCloud project properties
+#
 setProjectProperties(){
+    local project_name=${1}
+    local bucket_location=${2}
 
-    local projectName=${1}
-    local bucketLocation=${2}
-
-    gcloud config set project ${projectName}
-    local availZone=$(gcloud compute zones list | grep ${bucketLocation} | grep UP | awk '{print $1 }' | head -n1)
-    gcloud config set compute/zone ${availZone}
+    gcloud config set project "${project_name}"
+    local avail_zone
+    avail_zone=$(gcloud compute zones list | grep "${bucket_location}" | grep UP | awk '{ print $1 }' | head -n1)
+    gcloud config set compute/zone "${avail_zone}"
 }
 
+
+#
+# Echoes the bucket location
+#
 getBucketLocation(){
+    local bucket_name=${1}
 
-    local bucketName=${1}
-
-    local bucketLocation=$(gsutil ls -L -b gs://${bucketName} | grep Location | awk '{ print tolower($3) }')
-
-    echo ${bucketLocation}
+    local bucket_location
+    bucket_location=$(gsutil ls -L -b gs://"${bucket_name}" | grep Location | awk '{ print tolower($3) }')
+    echo "${bucket_location}"
 }
 
+
+#
+# Echoes the bucket zone
+#
 getBucketZone(){
+    local bucket_name=${1}
 
-    local bucketName=${1}
-
-    local bucketZone=$(gcloud compute zones list | grep -e $(gsutil ls -L -b gs://${bucketName} | grep Location | awk '{ print tolower($3) }' ) | awk '{ print $1 }' | sort | head -n1)
-
-    echo ${bucketZone}
+    local bucket_zone
+    bucket_zone=$(gcloud compute zones list | grep -e "$(gsutil ls -L -b gs://"${bucket_name}" | grep Location | awk '{ print tolower($3) }' )" | awk '{ print $1 }' | sort | head -n1)
+    echo "${bucket_zone}"
 }
 
-## 0 exists
-## 1 does not exist
+
+#
+# Checks if an instance exists. Echoes 0 if it exists, 1 otherwise
+#
 checkInstanceExistance(){
-
     local instance_name=${1}
 
-    gcloud compute instances list | grep -q ${instance_name}
-    echo $?
+    gcloud compute instances list | grep -q "${instance_name}"
+    echo "$?"
 }
 
+
+#
+# Echoes the instance zone
+#
 getInstanceZone(){
-
     local instance_name=${1}
 
-    echo $(gcloud compute instances list | grep ${instance_name} | awk '{ print $2 }')
-
+    local instance_zone
+    instance_zone=$(gcloud compute instances list | grep "${instance_name}" | awk '{ print $2 }')
+    echo "${instance_zone}"
 }
 
-removeInstance(){
 
+#
+# Removes the given instance
+#
+removeInstance(){
     local instance_name=${1}
 
-    if [ "0" -eq $(checkInstanceExistance ${instance_name}) ]; then
-        local instanceZone=$(getInstanceZone ${instance_name})
-        gcloud compute instances delete ${instance_name} -q --zone=${instanceZone}
+    local ie
+    ie=$(checkInstanceExistance "${instance_name}")
+    if [ "0" -eq "${ie}" ]; then
+        local instance_zone
+        instance_zone=$(getInstanceZone "${instance_name}")
+        gcloud compute instances delete "${instance_name}" -q --zone="${instance_zone}"
     fi
 }
 
+
+#
+# Echoes the service account
+#
 getServiceAccount(){
+    local identification_json=${1}
 
-    local identificationJson=${1}
+    local service_acc
+    service_acc=$(grep "client_email" "${identification_json}" | awk '{ print $2 }' | sed 's/\"//g' | sed 's/,//g')
 
-    echo $(cat ${identificationJson} | grep client_email | awk '{ print $2 }' | sed 's/\"//g' | sed 's/,//g')
-
+    echo "${service_acc}"
 }
 
-addPublicKey(){
 
-    local currentInstanceName=${1}
-    local currentZone=${2}
-    local publicSSHfile=${3}
+#
+# Adds a public key to an instance
+#
+addPublicKey(){
+    local current_instance_name=${1}
+    local current_zone=${2}
+    local public_ssh_file=${3}
     local instance_username=${4}
 
-    gcloud compute instances stop ${currentInstanceName} --zone=${currentZone}
-    gcloud compute instances describe ${currentInstanceName} --zone=${currentZone} | grep ssh-rsa | xargs -i echo {} > "/tmp/publicKeys${currentInstanceName}.txt"
-    currentPublicKey="$(cat ${publicSSHfile})" && echo "${instance_username}:${currentPublicKey}" >> "/tmp/publicKeys${currentInstanceName}.txt"
-    gcloud compute instances add-metadata ${currentInstanceName} --metadata-from-file ssh-keys="/tmp/publicKeys${currentInstanceName}.txt" --zone=${currentZone}
-    gcloud compute instances start ${currentInstanceName} --zone=${currentZone}
-    rm "/tmp/publicKeys${currentInstanceName}.txt"
+    local pubkey_path="/tmp/publicKeys${current_instance_name}.txt"
+    local current_public_key
 
+    gcloud compute instances stop "${current_instance_name}" --zone="${current_zone}"
+    gcloud compute instances describe "${current_instance_name}" --zone="${current_zone}" | grep ssh-rsa | xargs -i echo {} > "${pubkey_path}"
+    current_public_key=$(cat "${public_ssh_file}")
+    echo "${instance_username}:${current_public_key}" >> "${pubkey_path}"
+    gcloud compute instances add-metadata "${current_instance_name}" --metadata-from-file ssh-keys="/tmp/publicKeys${current_instance_name}.txt" --zone="${current_zone}"
+    gcloud compute instances start "${current_instance_name}" --zone="${current_zone}"
+    rm "${current_instance_name}"
 }
 
-# Put into currentIP the instance IP (so this can be used to get the IP of an instance assuming it is running)
-waitUntilRunning(){
 
+#
+# Put into CURRENT_IP the instance IP (so this can be used to get the IP of an instance assuming it is running)
+#
+waitUntilRunning(){
     local instance_name=${1}
     local instance_username=${2}
 
-    currentIP=$(gcloud compute instances list --filter="${instance_name}" | tail -n1 | awk '{print $5}')
-    ssh -q -o "StrictHostKeyChecking no" ${instance_username}@${currentIP} "exit"
-    while [ ! "$?" -eq "0" ]; do
-        echo "Could not stablish connection with ${instance_username}@${currentIP}, retry"
-        sleep 1
-        currentIP=$(gcloud compute instances list --filter="${instance_name}" | tail -n1 | awk '{print $5}')
-        ssh -q -o "StrictHostKeyChecking no" ${instance_username}@${currentIP} "exit"
+    CURRENT_IP=$(gcloud compute instances list --filter="${instance_name}" | tail -n1 | awk '{print $5}')
+    ssh -q -o "StrictHostKeyChecking no" "${instance_username}"@"${CURRENT_IP}" "exit"
+    ev=$?
+    while [ "${ev}" -ne 0 ]; do
+        echo "Could not stablish connection with ${instance_username}@${CURRENT_IP}, retrying..."
+        sleep 1s
+        CURRENT_IP=$(gcloud compute instances list --filter="${instance_name}" | tail -n1 | awk '{print $5}')
+        ssh -q -o "StrictHostKeyChecking no" "${instance_username}"@"${CURRENT_IP}" "exit"
+        ev=$?
     done
-    echo "The image ${instance_username}@${currentIP} is already running"
-
+    echo "The image ${instance_username}@${CURRENT_IP} is already running"
 }
 
+
+#
+# Creates a base instance
+#
 createBaseInstance(){
-
     local instance_name=${1}
-    local serviceAccount=${2}
-    local projectName=${3}
-    local currentZone=${4}
+    local service_account=${2}
+    local project_name=${3}
+    local current_zone=${4}
 
-    gcloud compute instances create ${instance_name} --zone ${currentZone} --machine-type n1-standard-1 --image ubuntu-minimal-1810-cosmic-v20190122 --image-project ubuntu-os-cloud --boot-disk-type pd-standard --boot-disk-size 10GB --boot-disk-device-name ${instance_name} --service-account ${serviceAccount}
-
+    gcloud compute instances create "${instance_name}" \
+            --zone "${current_zone}" \
+            --machine-type n1-standard-1 \
+            --image ubuntu-minimal-1810-cosmic-v20190122 \
+            --image-project ubuntu-os-cloud \
+            --boot-disk-type pd-standard \
+            --boot-disk-size 10GB \
+            --boot-disk-device-name "${instance_name}" \
+            --service-account "${service_account}"
 }
