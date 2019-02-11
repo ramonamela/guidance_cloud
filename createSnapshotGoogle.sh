@@ -43,6 +43,7 @@ loadEnv() {
     # shellcheck disable=SC1091
     source "${SCRIPT_DIR}/utilsGoogle.sh"
     #initSession
+    #setProjectName
     #setProjectProperties
     #getBucketLocation
     #getBucketZone
@@ -86,6 +87,10 @@ main() {
     echo "[INFO] Initializing session backend..."
     initSession "${IDENTIFICATION_JSON}"
 
+    # Set project name
+    echo "[INFO] Setting project name in backend..."
+    setProjectName "${PROJECT_NAME}"
+
     # Retrieve basic information
     echo "[INFO] Retrieving basic information..."
     bucket_location=$(getBucketLocation "${BUCKET_NAME}")
@@ -94,7 +99,7 @@ main() {
 
     # Set project properties
     echo "[INFO] Setting cloud project properties..."
-    setProjectProperties "${PROJECT_NAME}" "${bucket_location}"
+    setProjectProperties "${bucket_location}"
 
     # Create instance
     echo "Creating instance..."

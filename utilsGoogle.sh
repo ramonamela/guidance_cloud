@@ -21,13 +21,20 @@ initSession() {
 
 
 #
+# Sets the GCloud project name
+#
+setProjectName() {
+    local project_name=${1}
+
+    gcloud config set project "${project_name}"
+}
+
+#
 # Sets the GCloud project properties
 #
 setProjectProperties() {
-    local project_name=${1}
-    local bucket_location=${2}
+    local bucket_location=${1}
 
-    gcloud config set project "${project_name}"
     local avail_zone
     avail_zone=$(gcloud compute zones list | grep "${bucket_location}" | grep UP | awk '{ print $1 }' | head -n1)
     gcloud config set compute/zone "${avail_zone}"
