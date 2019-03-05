@@ -23,5 +23,3 @@ for i in xrange(amountOfNodes):
     outputs.append(procs[i].communicate())
 
 print(outputs)
-#print(int(amountOfNodes.split()[0]))
-#print(int(amountOfNodes.split()[0]))
