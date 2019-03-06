@@ -32,7 +32,7 @@ get_args() {
   node_id=$2
 }
 
-check_args() {
+check_and_load_args() {
   if [ ! -f "${internal_props_file}" ]; then
     echo "[ERROR] Properties file not found: ${internal_props_file}"
     exit 1
@@ -55,11 +55,31 @@ check_args() {
   # NODE_CPU
   # NODE_TYPE
   # NUM_NODES
+
+  # shellcheck source=../utils/create_base_instance.sh
+  # shellcheck disable=SC1091
+  source "${BACKEND_SCRIPT}"
+  # initSession
+  # setProjectName
+  # setProjectProperties
+  # getBucketLocation
+  # getBucketZone
+  # getServiceAccount
+  # addPublicKey
+  # waitUntilRunning
+  # getIP
+  # createDisk
+  # removeDisk
+  # checkInstanceExistance
+  # getInstanceZone
+  # createBaseInstance
+  # createInstance
+  # stopInstance
+  # removeInstance
+  # doSnapshot
 }
 
 create_node() {
-  local node_id=$1
-
   echo "[INFO][${node_id}] Creating new node with id = ${node_id}"
 
   local service_account
@@ -72,34 +92,23 @@ create_node() {
 
   # Clean previous instances (if any)
   echo "[INFO][${node_id}] Cleaning previous instance and disks"
-  "${SCRIPT_DIR}"/remove_instance.sh "${current_name}" "${current_zone}"
-  "${SCRIPT_DIR}"/remove_disk.sh "${current_name}" "${current_zone}"
+  removeInstance "${current_name}" "${current_zone}"
+  removeDisk "${current_name}" "${current_zone}"
 
   # Create new disks, instance, and SSH keys
   echo "[INFO][${node_id}] Creating new disks"
-  gcloud compute disks create "${current_name}" \
-    --zone="${current_zone}" \
-    --source-snapshot "${SNAPSHOT_NAME}"
+  createDisk "${current_name}" "${SNAPSHOT_NAME}" "${current_zone}"
 
   echo "[INFO][${node_id}] Creating new instance"
-  gcloud compute instances create "${current_name}" \
-    --zone="${current_zone}" \
-    --machine-type "${NODE_TYPE}" \
-    --service-account "${service_account}" \
-    --disk "name=${current_name},device-name=${current_name},mode=rw,boot=yes,auto-delete=yes" \
-    --scopes="storage-full"
+  createInstance "${current_name}" "${current_zone}" "${NODE_TYPE}" "${service_account}"
 
   echo "[INFO][${node_id}] Adding SSH keys"
-  "${SCRIPT_DIR}"/add_public_key.sh "${current_name}" "${current_zone}" "${USERNAME}" "${PUBLIC_SSH_FILE}"
+  addPublicKey "${current_name}" "${current_zone}" "${USERNAME}" "${PUBLIC_SSH_FILE}"
 
   # Wait until the image is running
   echo "[INFO][${node_id}] Waiting until the image is running..."
-  current_ip=$(gcloud compute instances list --filter=zone:${current_zone} | grep "${current_name}" | awk '{ print $5 }')
-  while ! ssh -q -o "StrictHostKeyChecking no" "${USERNAME}"@"${current_ip}" "exit"; do
-    echo "[INFO][${node_id}] Could not establish connection with ${USERNAME}@${current_ip}, retrying..."
-    sleep 3s
-    current_ip=$(gcloud compute instances list --filter=zone:${current_zone} | grep "${current_name}" | awk '{ print $5 }')
-  done
+  waitUntilRunning "${current_name}" "${current_zone}" "${USERNAME}"
+  current_ip=$(getIP "${current_name}" "${current_zone}")
   echo "[INFO][${node_id}] Image running"
 
   # Mount disks
@@ -122,14 +131,14 @@ create_node() {
 #
 
 main() {
-    # Retrieve arguments
-    get_args "$@"
+  # Retrieve arguments
+  get_args "$@"
 
-    # Check arguments
-    check_args
+  # Check arguments
+  check_and_load_args
 
-    # Create node
-    create_node "${node_id}"
+  # Create node
+  create_node
 }
 
 

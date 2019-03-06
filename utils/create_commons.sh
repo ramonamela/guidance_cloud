@@ -146,7 +146,7 @@ get_args() {
 check_args() {
   # Check cloud backend
   backend=${backend:-$DEFAULT_CLOUD_BACKEND}
-  BACKEND_SCRIPT=${COMMONS_SCRIPT_DIR}/../create_snapshot/${backend}.sh
+  BACKEND_SCRIPT=${COMMONS_SCRIPT_DIR}/../backends/${backend}.sh
   if [ ! -f "${BACKEND_SCRIPT}" ]; then
     echo "[ERROR] Invalid backend ${backend}"
     echo "[ERROR] Dependant script ${BACKEND_SCRIPT} not found"

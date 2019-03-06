@@ -21,11 +21,25 @@ SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
 # HELPER METHODS
 #
 
-loadEnv() {
-  local pfile=$1
+get_args() {
+  if [ $# -ne 1 ]; then
+    echo "[ERROR] Incorrect number of parameters"
+    echo "  Usage: $0 <internal_props_file>"
+    exit 1
+  fi
+
+  internal_props_file=$1
+}
+
+check_and_load_args() {
+  if [ ! -f "${internal_props_file}" ]; then
+    echo "[ERROR] Properties file not found: ${internal_props_file}"
+    exit 1
+  fi
+
   # shellcheck source=../props/default.props
   # shellcheck disable=SC1091
-  source "${pfile}"
+  source "${internal_props_file}"
   # USERNAME
   # PUBLIC_SSH_FILE
   # PROJECT_NAME
@@ -35,62 +49,55 @@ loadEnv() {
   # OVERRIDE_INSTANCE
   # BUCKET_NAME
   # SNAPSHOT_NAME
+  # CLUSTER_INSTANCE_NAME
   # NODE_MEM
   # NODE_CPU
   # NODE_TYPE
   # NUM_NODES
-  
+
   # shellcheck source=../utils/utils.sh
   # shellcheck disable=SC1091
   source "${SCRIPT_DIR}/../utils/utils.sh"
+  # installBasicDependencies
   # installGuidanceDependencies
   # installCOMPSs
   
-  # shellcheck source=../utils/google.sh
+  # shellcheck source=../utils/create_base_instance.sh
   # shellcheck disable=SC1091
-  source "${SCRIPT_DIR}/../utils/google.sh"
+  source "${BACKEND_SCRIPT}"
   # initSession
   # setProjectName
   # setProjectProperties
   # getBucketLocation
   # getBucketZone
-  # checkInstanceExistance
-  # getInstanceZone
-  # removeInstance
   # getServiceAccount
   # addPublicKey
   # waitUntilRunning
+  # getIP
+  # createDisk
+  # removeDisk
+  # checkInstanceExistance
+  # getInstanceZone
   # createBaseInstance
+  # createInstance
   # stopInstance
+  # removeInstance
+  # doSnapshot
 }
 
-createNewBaseInstance() {
+do_new_base_instance() {
   # Creates a new base instance
   createBaseInstance "${BASE_INSTANCE_NAME}" "${service_account}" "${PROJECT_NAME}" "${bucket_zone}"
   # Set up public key
-  addPublicKey "${BASE_INSTANCE_NAME}" "${bucket_zone}" "${PUBLIC_SSH_FILE}" "${USERNAME}"
+  addPublicKey "${BASE_INSTANCE_NAME}" "${bucket_zone}" "${USERNAME}" "${PUBLIC_SSH_FILE}"
   # Wait until instance is running
-  # WARN: SETS UP GLOBAL VARIABLE CURRENT_IP !!!!
-  waitUntilRunning "${BASE_INSTANCE_NAME}" "${USERNAME}"
+  zone=$(getInstanceZone "${BASE_INSTANCE_NAME}")
+  waitUntilRunning "${BASE_INSTANCE_NAME}" "${zone}" "${USERNAME}"
+  # WARN: Setting global variable CURRENT_IP !!!!
+  CURRENT_IP=$(getIP "${BASE_INSTANCE_NAME}" "${zone}")
 }
 
-
-#
-# MAIN METHOD
-#
-
-main() {
-  # Retrieve props file
-  if [ $# -ne 1 ]; then
-    echo "[ERROR] Invalid number of parameters"
-    echo "   Usage: $0 <props_file>"
-    exit 1
-  fi
-  props_file=${1}
-  
-  # Load environment and utils
-  loadEnv "${props_file}"
-  
+create_base_instance() {
   # Initialize backend session
   echo "[INFO] Initializing session backend..."
   initSession "${IDENTIFICATION_JSON}"
@@ -116,7 +123,7 @@ main() {
   echo "[INFO] Creating instance..."
   if [ "${OVERRIDE_INSTANCE}" = "true" ]; then
     removeInstance "${BASE_INSTANCE_NAME}"
-    createNewBaseInstance
+    do_new_base_instance
   else
     local ie
     ie=$(checkInstanceExistance "${BASE_INSTANCE_NAME}")
@@ -124,9 +131,13 @@ main() {
       echo "[WARN] Creating snapshot from existing instance"
       echo "[WARN] Set the configuration 'override' parameter to \"true\" in order to generate the instance again"
     else
-      createNewBaseInstance
+      do_new_base_instance
     fi
   fi
+
+  # Installing basic dependencies
+  echo "[INFO] Installing basic dependencies..."
+  installBasicDependencies "${USERNAME}" "${CURRENT_IP}"
   
   # Mount FUSE
   # This is done in order to mount a FUSE system on the bucket
@@ -146,7 +157,22 @@ main() {
   echo "[INFO] Stopping instance..."
   stopInstance "${BASE_INSTANCE_NAME}"
   
-  echo "DONE"
+  echo "[INFO] BaseImage DONE"
+}
+
+#
+# MAIN METHOD
+#
+
+main() {
+  # Retrieve arguments
+  get_args "$@"
+
+  # Check arguments
+  check_and_load_args
+
+  # Create node
+  create_base_instance
 }
 
 
