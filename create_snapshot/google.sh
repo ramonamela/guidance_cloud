@@ -61,6 +61,7 @@ loadEnv() {
   # addPublicKey
   # waitUntilRunning
   # createBaseInstance
+  # stopInstance
 }
 
 createNewBaseInstance() {
@@ -140,6 +141,10 @@ main() {
   # Install COMPSs
   echo "[INFO] Install COMPSs..."
   installCOMPSs "${USERNAME}" "${CURRENT_IP}"
+
+  # Stopping instance
+  echo "[INFO] Stopping instance..."
+  stopInstance "${BASE_INSTANCE_NAME}"
   
   echo "DONE"
 }

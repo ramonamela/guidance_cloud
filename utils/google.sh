@@ -181,3 +181,13 @@ createBaseInstance() {
     --boot-disk-device-name "${instance_name}" \
     --service-account "${service_account}"
 }
+
+
+#
+# Stops a running instance
+#
+stopInstance() {
+  local instance_name=${1}
+
+  gcloud compute instances stop "${instance_name}"
+}
