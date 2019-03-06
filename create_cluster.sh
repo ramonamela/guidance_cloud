@@ -5,7 +5,7 @@
 # BASH OPTIONS
 #
 
-set -e # Exit when command fails
+#set -e # Allow command errors to clean VMs if required
 set -u # Exit when undefined variable
 #set -x # Enable bash trace
 
@@ -28,13 +28,13 @@ create_cluster() {
 
   # Launch create_node in parallel
   declare -a node_pids
-  for (( i=0; c<NUM_NODES; c++ )); do
+  for (( i=0; i<NUM_NODES; i++ )); do
     create_node "${props_file}" $i &
     node_pids[$i]=$!
   done
 
   # Wait for all
-  for (( i=0; c<NUM_NODES; c++ )); do
+  for (( i=0; i<NUM_NODES; i++ )); do
     wait ${node_pids[$i]}
     ev=$?
     echo "[INFO] Create node $i finished with exit value = $ev"
@@ -64,16 +64,19 @@ main() {
   # show_version
   # get_args
   # check_args
-  # create_props_file
-  # BACKEND_SCRIPT
+  # create_internal_props_file
   # USERNAME
   # PUBLIC_SSH_FILE
   # PROJECT_NAME
+  # BACKEND_SCRIPT
   # IDENTIFICATION_JSON
   # BASE_INSTANCE_NAME
   # OVERRIDE_INSTANCE
   # BUCKET_NAME
   # SNAPSHOT_NAME
+  # NODE_MEM
+  # NODE_CPU
+  # NODE_TYPE
   # NUM_NODES
 
   # Retrive arguments
@@ -83,11 +86,11 @@ main() {
   check_args
 
   # Create props file
-  props_file=$(mktemp)
-  create_props_file "${props_file}"
+  internal_props_file=$(mktemp)
+  create_internal_props_file "${internal_props_file}"
 
   # Create cluster
-  create_cluser "${props_file}"
+  create_cluster "${internal_props_file}"
 }
 
 

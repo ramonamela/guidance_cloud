@@ -35,16 +35,19 @@ main() {
   # show_version
   # get_args
   # check_args
-  # create_props_file
-  # BACKEND_SCRIPT
+  # create_internal_props_file
   # USERNAME
   # PUBLIC_SSH_FILE
   # PROJECT_NAME
+  # BACKEND_SCRIPT
   # IDENTIFICATION_JSON
   # BASE_INSTANCE_NAME
   # OVERRIDE_INSTANCE
   # BUCKET_NAME
   # SNAPSHOT_NAME
+  # NODE_MEM
+  # NODE_CPU
+  # NODE_TYPE
   # NUM_NODES
 
   # Retrive arguments
@@ -54,11 +57,11 @@ main() {
   check_args
 
   # Create props file
-  props_file=$(mktemp)
-  create_props_file "${props_file}"
+  internal_props_file=$(mktemp)
+  create_internal_props_file "${internal_props_file}"
 
   # Launch backend script
-  "${BACKEND_SCRIPT}" "${props_file}"
+  "${BACKEND_SCRIPT}" "${internal_props_file}"
 }
 
 

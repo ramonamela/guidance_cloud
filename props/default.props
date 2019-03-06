@@ -2,7 +2,7 @@
 USERNAME="guidanceproject2018"
 PUBLIC_SSH_FILE="${HOME}/.ssh/id_rsa.pub"
 PROJECT_NAME="guidance"
-IDENTIFICATION_JSON="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )/guidance-06986d1d6789.json"
+IDENTIFICATION_JSON="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )/../guidance-06986d1d6789.json"
 
 ## Base instance information
 BASE_INSTANCE_NAME="guidancebase"
@@ -14,5 +14,8 @@ BUCKET_NAME="bucket-${PROJECT_NAME}"
 ## Snapshot name
 SNAPSHOT_NAME="snap${PROJECT_NAME}"
 
-## Cluster size
-NUM_NODES=4
+## Cluster options
+CLUSTER_INSTANCE_NAME="guidancecluster"
+NODE_MEM="standard"  # standard, highmem, highcpu
+NODE_CPUS=1
+NUM_NODES=2
