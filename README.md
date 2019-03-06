@@ -23,7 +23,8 @@ Utils to configure Guidance and COMPSS in a cloud environment.
 ## Commands
 
 ```bash
-./createSnapshot.sh -h
+./create_snapshot.sh -h
+./create_cluster.sh -h
 ```
 
 ## Contributing

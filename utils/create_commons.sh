@@ -1,5 +1,3 @@
-#!/bin/bash
-
 #
 # BASH OPTIONS
 #
@@ -8,16 +6,17 @@ set -e # Exit when command fails
 set -u # Exit when undefined variable
 #set -x # Enable bash trace
 
+
 #
 # SCRIPT GLOBAL VARIABLES
 #
 
 SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
-DEFAULT_CLOUD_BACKEND="Google"
+DEFAULT_CLOUD_BACKEND="google"
 
 
 #
-# HELPER METHODS
+# SOURCEABLE METHODS
 #
 
 usage() {
@@ -26,13 +25,13 @@ Usage: $0 [options]
 
     * Options:
         -v                             Display version
-        -h                             Display help message 
+        -h                             Display help message
 
         --help                         Display help message
         --version                      Display version
         --backend=<backend>            Set cloud backend
                                        Default: ${DEFAULT_CLOUD_BACKEND}
-        --snapshot_props=<file>        Loads variables from properties file
+        --props=<file>                 Loads variables from properties file
         --username=<string>            Sets username variable
         --public_ssh_file=<file>       Sets public ssh file
         --project_name=<string>        Sets project name
@@ -41,6 +40,7 @@ Usage: $0 [options]
         --override_instance=<boolean>  When activated, overrides the base instance
         --bucket_name=<string>         Sets the bucket name
         --snapshot_name=<string>       Sets the snapshot name
+        --num_nodes=<int>              Number of nodes for the cluster
 
 EOT
 
@@ -81,8 +81,8 @@ get_args() {
                     backend=*)
                         backend=${OPTARG//backend=/}
                         ;;
-                    snapshot_props=*)
-                        snapshot_props_file=${OPTARG//snapshot_props=/}
+                    props=*)
+                        props_file=${OPTARG//props=/}
                         ;;
                     username=*)
                         USERNAME=${OPTARG//username=/}
@@ -108,6 +108,9 @@ get_args() {
                     snapshot_name=*)
                         SNAPSHOT_NAME=${OPTARG//snapshot_name=/}
                         ;;
+                    num_nodes=*)
+                        NUM_NODES=${OPTARG//num_nodes=/}
+                        ;;
                     *)
                         # Flag didn't match any patern. Raise exception
                         echo "[ERROR] Invalid argument: $OPTARG"
@@ -128,20 +131,20 @@ get_args() {
 check_args() {
     # Check cloud backend
     backend=${backend:-$DEFAULT_CLOUD_BACKEND}
-    backend_script=${SCRIPT_DIR}/createSnapshot${backend}.sh
-    if [ ! -f "${backend_script}" ]; then
+    BACKEND_SCRIPT=${SCRIPT_DIR}/createSnapshot${backend}.sh
+    if [ ! -f "${BACKEND_SCRIPT}" ]; then
        echo "[ERROR] Invalid backend ${backend}"
-       echo "[ERROR] Dependant script ${backend_script} not found"
+       echo "[ERROR] Dependant script ${BACKEND_SCRIPT} not found"
        exit 1
     fi
 
     # Load properties file if specified
-    if [ -n "${snapshot_props_file}" ]; then
-        echo "[INFO] Loading parameters from properties file ${snapshot_props_file}"
+    if [ -n "${props_file}" ]; then
+        echo "[INFO] Loading parameters from properties file ${props_file}"
         echo "[WARN] Command arguments will be overriden by file definitions"
-        # shellcheck source=./configureSnapshot.props
+        # shellcheck source=./props/default.props
         # shellcheck disable=SC1091
-        source "${SCRIPT_DIR}"/"${snapshot_props_file}"
+        source "${SCRIPT_DIR}"/"${props_file}"
     fi
 
     # Check required variables (may have been loaded from props file)
@@ -184,13 +187,19 @@ check_args() {
         echo "[ERROR] SNAPSHOT_NAME not defined"
         exit 1
     fi
+
+    if [ -z "${NUM_NODES}" ]; then
+        echo "[ERROR] NUM_NODES not defined"
+        exit 1
+    fi
+
 }
 
 create_props_file() {
     local pfile=$1
 
     cat > "${pfile}" <<EOT
-## General project information                                                                                                                                                                                                              
+## General project information
 USERNAME=${USERNAME}
 PUBLIC_SSH_FILE=${PUBLIC_SSH_FILE}
 PROJECT_NAME=${PROJECT_NAME}
@@ -205,31 +214,8 @@ BUCKET_NAME=${BUCKET_NAME}
 
 ## Snapshot name
 SNAPSHOT_NAME=${SNAPSHOT_NAME}
+
+## Num nodes
+NUM_NODES=${NUM_NODES}
 EOT
 }
-
-
-#
-# MAIN METHOD
-#
-
-main() {
-    # Retrive arguments
-    get_args "$@"
-
-    # Check arguments
-    check_args
-
-    # Create props file
-    props_file=$(mktemp)
-    create_props_file "${props_file}"
-
-    # Launch backend script
-    "${backend_script}" "${props_file}"
-}
-
-#
-# ENTRY POINT
-#
-
-main "$@"

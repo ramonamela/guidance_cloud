@@ -11,6 +11,7 @@ set -u # Exit when undefined variable
 # HELPER METHODS
 #
 
+
 #
 # Inits the GCloud session
 #
@@ -28,6 +29,7 @@ setProjectName() {
 
     gcloud config set project "${project_name}"
 }
+
 
 #
 # Sets the GCloud project properties

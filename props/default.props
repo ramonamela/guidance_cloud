@@ -13,3 +13,6 @@ BUCKET_NAME="bucket-${PROJECT_NAME}"
 
 ## Snapshot name
 SNAPSHOT_NAME="snap${PROJECT_NAME}"
+
+## Cluster size
+NUM_NODES=4

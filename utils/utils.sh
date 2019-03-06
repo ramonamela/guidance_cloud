@@ -11,43 +11,6 @@ set -u # Exit when undefined variable
 # HELPER METHODS
 #
 
-## Variables that must be defined before:
-#   SCRIPT_DIR
-#   It is assumed that the utils{CloudService}.sh has been sourced before (so we have all the functions available)
-createClusterNode(){
-
-    serviceAccount=$(gcloud compute instances describe ${instanceName} | grep service | awk '{ print $3 }')
-    machineType=$(gcloud compute instances describe ${instanceName} | grep machine | awk '{ print $2 }' | tr "/" "\t" | awk '{ print $NF }')
-
-    currentZone="us-east1-c"
-    currentName="${baseInstanceName}$(printf %04d ${1})"
-
-    ${SCRIPT_DIR}/removeInstance.sh ${currentName} ${currentZone}
-    ${SCRIPT_DIR}/removeDisk.sh ${currentName} ${currentZone}
-
-    gcloud compute disks create ${currentName} --zone=${currentZone} --source-snapshot "${snapName}"
-    gcloud compute instances create "${currentName}" --zone=${currentZone} --machine-type ${machineType} --service-account ${serviceAccount} --disk "name=${currentName},device-name=${currentName},mode=rw,boot=yes,auto-delete=yes" --scopes="storage-full"
-    ${SCRIPT_DIR}/addPublicKeyGoogleCloud.sh ${currentName} ${currentZone}
-
-    echo "Wait until the image is running"
-    currentIP=$(gcloud compute instances list --filter="${currentName}" --filter=zone:${currentZone} | tail -n1 | awk '{print $5}')
-    ssh -q -o "StrictHostKeyChecking no" ${instanceUsername}@${currentIP} "exit"
-    while [ ! "$?" -eq "0" ]; do
-        echo "Could not stablish connection with ${instanceUsername}@${currentIP}, retry"
-        sleep 3
-        currentIP=$(gcloud compute instances list --filter="${currentName}" --filter=zone:${currentZone} | tail -n1 | awk '{print $5}')
-        ssh -q -o "StrictHostKeyChecking no" ${instanceUsername}@${currentIP} "exit"
-    done
-
-    #ssh -q -o "StrictHostKeyChecking no" ${instanceUsername}@${currentIP} "cat /etc/fuse.conf | grep -v user_allow_other > tmp.conf;echo user_allow_other >> tmp.conf;sudo mv tmp.conf /etc/fuse.conf"
-
-    ssh -q -o "StrictHostKeyChecking no" ${instanceUsername}@${currentIP} "bash -s" -- < ${SCRIPT_DIR}/mountDisk.sh ${bucketName}
-    while [ ! "$?" -eq "0" ]; do
-        sleep 3
-        ssh -q -o "StrictHostKeyChecking no" ${instanceUsername}@${currentIP} "bash -s" -- < ${SCRIPT_DIR}/mountDisk.sh ${bucketName}
-    done
-}
-
 installGuidanceDependenciesCommands() {
     # Enable error manager 
     set -e

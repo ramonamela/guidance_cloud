@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 #
 # BASH OPTIONS
 #
@@ -7,6 +8,7 @@
 set -e # Exit when command fails
 set -u # Exit when undefined variable
 #set -x # Enable bash trace
+
 
 #
 # SCRIPT GLOBAL VARIABLES
@@ -21,39 +23,40 @@ SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
 
 loadEnv() {
     local pfile=$1
-    # shellcheck source=./configureSanpshot.props
+    # shellcheck source=../props/default.props
     # shellcheck disable=SC1091
     source "${pfile}"
-    #USERNAME
-    #PUBLIC_SSH_FILE
-    #PROJECT_NAME
-    #IDENTIFICATION_JSON
-    #BASE_INSTANCE_NAME
-    #OVERRIDE_INSTANCE
-    #BUCKET_NAME
-    #SNAPSHOT_NAME
+    # USERNAME
+    # PUBLIC_SSH_FILE
+    # PROJECT_NAME
+    # IDENTIFICATION_JSON
+    # BASE_INSTANCE_NAME
+    # OVERRIDE_INSTANCE
+    # BUCKET_NAME
+    # SNAPSHOT_NAME
+    # NUM_NODES
     
-    # shellcheck source=./utils.sh
+    # shellcheck source=../utils/utils.sh
     # shellcheck disable=SC1091
-    source "${SCRIPT_DIR}/utils.sh"
-    #installGuidanceDependencies
-    #installCOMPSs
+    source "${SCRIPT_DIR}/../utils/utils.sh"
+    # installGuidanceDependencies
+    # installCOMPSs
     
-    # shellcheck source=./utilsGoogle.sh
+    # shellcheck source=../utils/google.sh
     # shellcheck disable=SC1091
-    source "${SCRIPT_DIR}/utilsGoogle.sh"
-    #initSession
-    #setProjectName
-    #setProjectProperties
-    #getBucketLocation
-    #getBucketZone
-    #checkInstanceExistance
-    #getInstanceZone
-    #removeInstance
-    #getServiceAccount
-    #addPublicKey
-    #waitUntilRunning
-    #createBaseInstance
+    source "${SCRIPT_DIR}/../utils/google.sh"
+    # initSession
+    # setProjectName
+    # setProjectProperties
+    # getBucketLocation
+    # getBucketZone
+    # checkInstanceExistance
+    # getInstanceZone
+    # removeInstance
+    # getServiceAccount
+    # addPublicKey
+    # waitUntilRunning
+    # createBaseInstance
 }
 
 createNewBaseInstance() {
@@ -93,7 +96,7 @@ main() {
 
     # Retrieve basic information
     echo "[INFO] Retrieving basic information..."
-    local bucket_localtion
+    local bucket_location
     local bucket_zone
     local service_account
     bucket_location=$(getBucketLocation "${BUCKET_NAME}")
@@ -137,9 +140,9 @@ main() {
     echo "DONE"
 }
 
+
 #
 # SCRIPT ENTRY POINT
 #
 
 main "$@"
-
