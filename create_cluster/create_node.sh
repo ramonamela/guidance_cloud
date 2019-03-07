@@ -92,7 +92,7 @@ create_node() {
 
   # Clean previous instances (if any)
   echo "[INFO][${node_id}] Cleaning previous instance and disks"
-  removeInstance "${current_name}" "${current_zone}"
+  removeInstance "${current_name}"
   removeDisk "${current_name}" "${current_zone}"
 
   # Create new disks, instance, and SSH keys

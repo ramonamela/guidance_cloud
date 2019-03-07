@@ -5,7 +5,7 @@
 # BASH OPTIONS
 #
 
-#set -e # Allow command errors to clean VMs if required
+set +e # Allow command errors to clean VMs if required
 set -u # Exit when undefined variable
 #set -x # Enable bash trace
 
@@ -22,32 +22,59 @@ SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
 #
 
 create_cluster() {
-  local props_file=$1
-
   echo "[INFO] Creating cluster with ${NUM_NODES} nodes"
 
   # Launch create_node in parallel
   declare -a node_pids
   for (( i=0; i<NUM_NODES; i++ )); do
-    create_node "${props_file}" $i &
+    "${SCRIPT_DIR}"/create_cluster/create_node.sh "${internal_props_file}" "${i}" &
     node_pids[$i]=$!
   done
 
   # Wait for all
+  declare -a node_evs
   for (( i=0; i<NUM_NODES; i++ )); do
-    wait ${node_pids[$i]}
-    ev=$?
-    echo "[INFO] Create node $i finished with exit value = $ev"
+    node_evs[$i]=0
+    wait ${node_pids[$i]} || node_evs[$i]=1
+    echo "[INFO] Create node $i finished with exit value = ${node_evs[$i]}"
   done
 
-  echo "DONE"
+  # Check all exit values
+  local global_ev=0
+  for (( i=0; i<NUM_NODES; i++ )); do
+    if [ ${node_evs[$i]} -ne 0 ]; then
+      echo "[ERROR] Summary: Node $i has failed"
+      global_ev=1
+      break
+    else
+      echo "[INFO] Summary: Node $i has been successfully created"
+    fi
+  done
+
+  if [ "${global_ev}" -ne 0 ]; then
+    echo "[ERROR] A node creation has failed, cleaning all instances..."
+    remove_cluster
+  else
+    echo "DONE"
+  fi
+  exit "${global_ev}"
 }
 
-create_node() {
-  local props_file=$1
-  local node_id=$2
+remove_cluster() {
+  # Launch remove_node in parallel
+  declare -a remove_node_pids
+  for (( i=0; i<NUM_NODES; i++ )); do
+    "${SCRIPT_DIR}"/create_cluster/remove_node.sh "${internal_props_file}" "${i}" &
+    remove_node_pids[$i]=$!
+  done
 
-  "${SCRIPT_DIR}"/create_cluster/create_node.sh "${props_file}" "${node_id}"
+  # Wait for all
+  local ev
+  for (( i=0; i<NUM_NODES; i++ )); do
+    ev=0
+    wait ${remove_node_pids[$i]} || ev=1
+    echo "[INFO] Removing node $i finished with exit value = ${ev}"
+  done
 }
 
 
@@ -90,7 +117,7 @@ main() {
   create_internal_props_file "${internal_props_file}"
 
   # Create cluster
-  create_cluster "${internal_props_file}"
+  create_cluster
 }
 
 
