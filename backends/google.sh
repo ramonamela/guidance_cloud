@@ -61,11 +61,21 @@ getBucketZone() {
 }
 
 # Echoes the service account
-getServiceAccount() {
+getServiceAccountFromJSON() {
   local identification_json=${1}
 
   local service_acc
   service_acc=$(grep "client_email" "${identification_json}" | awk '{ print $2 }' | sed 's/\"//g' | sed 's/,//g')
+
+  echo "${service_acc}"
+}
+
+# Echoes the service account
+getServiceAccount() {
+  local instance_name=${1}
+
+  local service_acc
+  service_acc=$(gcloud compute instances describe "${instance_name}" | grep "email" | tr ":" "\\t" | awk '{ print $NF }')
 
   echo "${service_acc}"
 }

@@ -86,8 +86,8 @@ create_node() {
   local current_zone
   local current_name
 
-  service_account=$(gcloud compute instances describe "${BASE_INSTANCE_NAME}" | grep "email" | tr ":" "\\t" | awk '{ print $NF }')
-  current_zone="us-east1-c"
+  service_account=$(getServiceAccount "${BASE_INSTANCE_NAME}")
+  current_zone=$(getBucketZone "${BUCKET_NAME}") # "us-east1-c"
   current_name="${CLUSTER_INSTANCE_NAME}$(printf %04d "${node_id}")"
 
   # Clean previous instances (if any)
