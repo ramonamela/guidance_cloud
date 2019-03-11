@@ -29,7 +29,7 @@ installBasicDependenciesCommands() {
   export GOPATH="$HOME/go"
   go get -u github.com/googlecloudplatform/gcsfuse
   sudo mkdir -p /opt/userBin
-  sudo mv $HOME/go/bin/gcsfuse /opt/userBin/
+  sudo mv "$HOME"/go/bin/gcsfuse /opt/userBin/
   rm -rf ~/go
   sudo ln -s /opt/userBin/gcsfuse /bin/gcsfuse
 }

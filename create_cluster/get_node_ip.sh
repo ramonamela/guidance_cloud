@@ -77,15 +77,15 @@ check_and_load_args() {
   # doSnapshot
 }
 
-remove_node() {
-  echo "[INFO][${node_id}] Deleting instance for node with id = ${node_id}"
 
-  local current_name
-  current_name="${CLUSTER_INSTANCE_NAME}$(printf %04d "${node_id}")"
-  removeInstance "${current_name}"
+get_node_ip() {
+  local node_zone
+  local node_name
+  node_zone=$(getBucketZone "${BUCKET_NAME}") # "us-east1-c"
+  node_name="${CLUSTER_INSTANCE_NAME}$(printf %04d "${node_id}")"
 
-  # DONE
-  echo "[INFO][${node_id}] Node ${node_id} removed"
+  node_ip=$(getIP "${node_name}" "${node_zone}")
+  echo "${node_ip}"
 }
 
 
@@ -100,8 +100,8 @@ main() {
   # Check arguments
   check_and_load_args
 
-  # Create node
-  remove_node
+  # Get node ip
+  get_node_ip
 }
 
 

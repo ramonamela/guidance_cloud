@@ -46,7 +46,7 @@ main() {
   # BUCKET_NAME
   # SNAPSHOT_NAME
   # NODE_MEM
-  # NODE_CPU
+  # NODE_CPUS
   # NODE_TYPE
   # NUM_NODES
 

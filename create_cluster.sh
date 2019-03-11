@@ -40,7 +40,6 @@ create_cluster() {
   done
 
   # Check all exit values
-  local global_ev=0
   for (( i=0; i<NUM_NODES; i++ )); do
     if [ ${node_evs[$i]} -ne 0 ]; then
       echo "[ERROR] Summary: Node $i has failed"
@@ -55,9 +54,8 @@ create_cluster() {
     echo "[ERROR] A node creation has failed, cleaning all instances..."
     remove_cluster
   else
-    echo "DONE"
+    echo "[INFO] Creating cluster DONE"
   fi
-  exit "${global_ev}"
 }
 
 remove_cluster() {
@@ -75,6 +73,31 @@ remove_cluster() {
     wait ${remove_node_pids[$i]} || ev=1
     echo "[INFO] Removing node $i finished with exit value = ${ev}"
   done
+}
+
+setup_cluster() {
+  echo "[INFO] Setting up cluster with ${NUM_NODES} nodes"
+
+  # Retrieve master IP
+  master_ip=$("${SCRIPT_DIR}"/create_cluster/get_node_ip.sh "${internal_props_file}" 0)
+  echo "[INFO] MASTER NODE WILL RUN IN ${master_ip}"
+
+  # Retrieve worker IPs
+  num_workers=$((NUM_NODES - 1 ))
+  declare -a worker_ips
+  for (( i=1; i<NUM_NODES; i++ )); do
+    ip=$("${SCRIPT_DIR}"/create_cluster/get_node_ip.sh "${internal_props_file}" "${i}")
+    worker_ips[$i]=${ip}
+  done
+
+  # Configure master
+  scp "${SCRIPT_DIR}"/create_cluster/setup_cluster.sh "${USERNAME}"@"${master_ip}":.
+  # shellcheck disable=SC2086  # Array split on purpose
+  ssh "${USERNAME}"@"${master_ip}" ./setup_cluster.sh "${NODE_CPUS}" "${num_workers}" ${worker_ips[*]}
+  global_ev=$?
+  ssh "${USERNAME}"@"${master_ip}" rm -f setup_cluster.sh
+
+  echo "[INFO] Setting up cluster DONE"
 }
 
 
@@ -102,7 +125,7 @@ main() {
   # BUCKET_NAME
   # SNAPSHOT_NAME
   # NODE_MEM
-  # NODE_CPU
+  # NODE_CPUS
   # NODE_TYPE
   # NUM_NODES
 
@@ -117,7 +140,15 @@ main() {
   create_internal_props_file "${internal_props_file}"
 
   # Create cluster
+  global_ev=0
   create_cluster
+
+  # Setup cluster
+  if [ "${global_ev}" -eq 0 ]; then
+    setup_cluster
+  fi
+
+  exit "${global_ev}"
 }
 
 
