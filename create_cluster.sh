@@ -15,7 +15,7 @@ set -u # Exit when undefined variable
 #
 
 SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
-MN_USER=bsc19533 # Also requires a MN_USER priv/public key with the same name
+#MN_USER=bsc19533 # Also requires a MN_USER priv/public key with the same name
 
 
 #
@@ -121,22 +121,22 @@ deploy_files() {
     exit $ev
   fi
 
-  echo "[INFO] Deploying SSH keys to ${master_ip}..."
-  scp ~/.ssh/${MN_USER}* "${USERNAME}@${master_ip}:/home/${USERNAME}/.ssh/"
-  ev=$?
-  if [ "$ev" -ne 0 ]; then
-    echo "[ERROR] Cannot deploy MN keys"
-    exit $ev
-  fi
+  # echo "[INFO] Deploying SSH keys to ${master_ip}..."
+  # scp ~/.ssh/${MN_USER}* "${USERNAME}@${master_ip}:/home/${USERNAME}/.ssh/"
+  # ev=$?
+  # if [ "$ev" -ne 0 ]; then
+  #   echo "[ERROR] Cannot deploy MN keys"
+  #   exit $ev
+  # fi
 
-  echo "[INFO] Deploying input data to ${master_ip}..."
-  # shellcheck disable=SC2029  # We want variables to be expanded in client side
-  ssh "${USERNAME}@${master_ip}" scp -v -r -i "/home/${USERNAME}/.ssh/${MN_USER}" "${MN_USER}"@mn1.bsc.es:/gpfs/projects/bsc19/GUIDANCE/inputs "/home/${USERNAME}/${BUCKET_NAME}/"
-  ev=$?
-  if [ "$ev" -ne 0 ]; then
-    echo "[ERROR] Cannot deploy input data"
-    exit $ev
-  fi
+  # echo "[INFO] Deploying input data to ${master_ip}..."
+  # # shellcheck disable=SC2029  # We want variables to be expanded in client side
+  # ssh "${USERNAME}@${master_ip}" scp -v -r -i "/home/${USERNAME}/.ssh/${MN_USER}" "${MN_USER}"@mn1.bsc.es:/gpfs/projects/bsc19/GUIDANCE/inputs "/home/${USERNAME}/${BUCKET_NAME}/"
+  # ev=$?
+  # if [ "$ev" -ne 0 ]; then
+  #   echo "[ERROR] Cannot deploy input data"
+  #   exit $ev
+  # fi
 
   echo "[INFO] Deploying files DONE"
   global_ev=0
