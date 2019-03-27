@@ -1,0 +1,21 @@
+## General project information
+USERNAME="guidanceproject2018"
+PUBLIC_SSH_FILE="${HOME}/.ssh/id_rsa.pub"
+PROJECT_NAME="guidance"
+IDENTIFICATION_JSON="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )/../guidance-06986d1d6789.json"
+
+## Base instance information
+BASE_INSTANCE_NAME="guidancebase"
+OVERRIDE_INSTANCE="true"
+
+## Bucket information
+BUCKET_NAME="bucket-${PROJECT_NAME}"
+
+## Snapshot name
+SNAPSHOT_NAME="snap${PROJECT_NAME}"
+
+## Cluster options
+CLUSTER_INSTANCE_NAME="guidancecluster"
+NODE_MEM="highmem"  # standard, highmem, highcpu
+NODE_CPUS=4
+NUM_NODES=2
