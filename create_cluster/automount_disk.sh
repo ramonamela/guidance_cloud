@@ -35,8 +35,9 @@ SCRIPTNAME=/etc/init.d/$NAME
 #
 
 create_bucket() {
-  local bucket_name="bucket-guidance"
-  local bucket_loc="/home/guidanceproject2018/${bucket_name}"
+  username="guidanceproject2018"
+  bucket_name="bucket-guidance"
+  bucket_loc="/home/${username}/${bucket_name}"
 
   mkdir -p "${bucket_loc}"
   gcsfuse -o nonempty \
@@ -56,11 +57,24 @@ main() {
 
   case "$1" in
     start)
-      echo "Creating bucket..."
+      echo "Creating fuse bucket..."
       create_bucket
       ;;
+    stop)
+      echo "Stoping fuse bucket..."
+      ;;
+    restart)
+      echo "Restarting fuse bucket..."
+      create_bucket
+      ;;
+    reset)
+      echo "Reset fuse bucket..."
+      ;;
+    clean)
+      echo "Cleaning fuse bucket..."
+      ;;
     *)
-      echo "Nothing to do"
+      echo "Usage: $SCRIPTNAME { start | stop | restart | reset | clean }"
       ;;
   esac
 
