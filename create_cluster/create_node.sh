@@ -121,6 +121,8 @@ create_node() {
   done
   echo "[INFO][${node_id}] Disks mounted"
 
+  # TODO: The mount script automount_fuse.sh should be injected to the /etc/init.d to have the fuse mounted between node restarts
+
   # DONE
   echo "[INFO][${node_id}] Node ${node_id} DONE"
 }
