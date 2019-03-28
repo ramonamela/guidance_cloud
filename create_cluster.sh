@@ -93,15 +93,15 @@ setup_cluster() {
   done
 
   # Configure master
-  scp "${SCRIPT_DIR}"/create_cluster/setup_cluster.sh "${USERNAME}"@"${master_ip}":.
+  scp -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/create_cluster/setup_cluster.sh "${USERNAME}"@"${master_ip}":.
   # shellcheck disable=SC2086  # Array split on purpose
-  ssh "${USERNAME}"@"${master_ip}" ./setup_cluster.sh "${NODE_CPUS}" "${num_workers}" ${worker_ips[*]}
+  ssh -o "StrictHostKeyChecking no" "${USERNAME}"@"${master_ip}" ./setup_cluster.sh "${NODE_CPUS}" "${num_workers}" ${worker_ips[*]}
   ev=$?
   if [ "$ev" -ne 0 ]; then
     echo "[ERROR] Cannot setup cluster"
     exit $ev
   fi
-  ssh "${USERNAME}"@"${master_ip}" rm -f setup_cluster.sh
+  ssh -o "StrictHostKeyChecking no" "${USERNAME}"@"${master_ip}" rm -f setup_cluster.sh
 
   echo "[INFO] Setting up cluster DONE"
   global_ev=0
@@ -112,17 +112,48 @@ deploy_files() {
   local master_ip
   master_ip=$("${SCRIPT_DIR}"/create_cluster/get_node_ip.sh "${internal_props_file}" 0)
 
-  # Deploy scripts and input data
+  # Deploy execution scripts
   echo "[INFO] Deploying execution scripts to ${master_ip}..."
-  scp -v -r "${SCRIPT_DIR}"/execution/* "${USERNAME}@${master_ip}:/home/${USERNAME}/${BUCKET_NAME}/"
+  scp -v -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/execution/launch.sh "${USERNAME}@${master_ip}:/home/${USERNAME}/"
   ev=$?
   if [ "$ev" -ne 0 ]; then
-    echo "[ERROR] Cannot deploy execution scripts"
+    echo "[ERROR] Cannot deploy launch script"
+    exit $ev
+  fi
+  scp -v -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/execution/set_environment.sh "${USERNAME}@${master_ip}:/home/${USERNAME}/"
+  ev=$?
+  if [ "$ev" -ne 0 ]; then
+    echo "[ERROR] Cannot deploy set_environment script"
     exit $ev
   fi
 
+  # TODO: Decide which files should be deployed on cluster creation
+
+  # Deploy guidance sources and cfg files
+  # echo "[INFO] Deploying Guidance sources and CFG files to ${master_ip}..."
+  # scp -v -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/execution/*.jar "${USERNAME}@${master_ip}:/home/${USERNAME}/${BUCKET_NAME}/"
+  # ev=$?
+  # if [ "$ev" -ne 0 ]; then
+  #   echo "[ERROR] Cannot deploy Guidance JAR file"
+  #   exit $ev
+  # fi
+
+  # scp -v -r -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/execution/R_SCRIPTS "${USERNAME}@${master_ip}:/home/${USERNAME}/${BUCKET_NAME}/"
+  # ev=$?
+  # if [ "$ev" -ne 0 ]; then
+  #   echo "[ERROR] Cannot deploy R_SCRIPTS"
+  #   exit $ev
+  # fi
+
+  # scp -v -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/execution/config_* "${USERNAME}@${master_ip}:/home/${USERNAME}/${BUCKET_NAME}/"
+  # ev=$?
+  # if [ "$ev" -ne 0 ]; then
+  #   echo "[ERROR] Cannot deploy configuration files"
+  #   exit $ev
+  # fi
+
   # echo "[INFO] Deploying SSH keys to ${master_ip}..."
-  # scp ~/.ssh/${MN_USER}* "${USERNAME}@${master_ip}:/home/${USERNAME}/.ssh/"
+  # scp -o "StrictHostKeyChecking no" ~/.ssh/${MN_USER}* "${USERNAME}@${master_ip}:/home/${USERNAME}/.ssh/"
   # ev=$?
   # if [ "$ev" -ne 0 ]; then
   #   echo "[ERROR] Cannot deploy MN keys"
@@ -131,7 +162,7 @@ deploy_files() {
 
   # echo "[INFO] Deploying input data to ${master_ip}..."
   # # shellcheck disable=SC2029  # We want variables to be expanded in client side
-  # ssh "${USERNAME}@${master_ip}" scp -v -r -i "/home/${USERNAME}/.ssh/${MN_USER}" "${MN_USER}"@mn1.bsc.es:/gpfs/projects/bsc19/GUIDANCE/inputs "/home/${USERNAME}/${BUCKET_NAME}/"
+  # ssh -o "StrictHostKeyChecking no" "${USERNAME}@${master_ip}" scp -v -r -i "/home/${USERNAME}/.ssh/${MN_USER}" "${MN_USER}"@mn1.bsc.es:/gpfs/projects/bsc19/GUIDANCE/inputs "/home/${USERNAME}/${BUCKET_NAME}/"
   # ev=$?
   # if [ "$ev" -ne 0 ]; then
   #   echo "[ERROR] Cannot deploy input data"

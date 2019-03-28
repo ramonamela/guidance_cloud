@@ -111,6 +111,10 @@ create_node() {
   current_ip=$(getIP "${current_name}" "${current_zone}")
   echo "[INFO][${node_id}] Image running"
 
+  # Add private/public ssh key
+  scp -o "StrictHostKeyChecking no" "${PUBLIC_SSH_FILE}" "${USERNAME}"@"${current_ip}":~/.ssh/
+  scp -o "StrictHostKeyChecking no" "${PUBLIC_SSH_FILE::-4}" "${USERNAME}"@"${current_ip}":~/.ssh/
+
   # Mount disks
   echo "[INFO][${node_id}] Mounting disks"
   ssh -q -o "StrictHostKeyChecking no" "${USERNAME}"@"${current_ip}" "cat /etc/fuse.conf | grep -v user_allow_other > tmp.conf;echo user_allow_other >> tmp.conf;sudo mv tmp.conf /etc/fuse.conf"
