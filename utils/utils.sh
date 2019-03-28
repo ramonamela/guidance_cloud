@@ -186,8 +186,8 @@ installCOMPSsCommands() {
   local compss_path="$HOME"/"${compss_version}"
   
   ## Setup bash environment
-  grep -v "JAVA_HOME" "$HOME"/.bashrc > "$HOME"/newbashrc
-  echo "export JAVA_HOME=\"/usr/lib/jvm/java-8-openjdk-amd64/\"" >> "$HOME"/newbashrc
+  echo "export JAVA_HOME=\"/usr/lib/jvm/java-8-openjdk-amd64/\"" > "$HOME"/newbashrc
+  grep -v "JAVA_HOME" "$HOME"/.bashrc >> "$HOME"/newbashrc
   mv "$HOME"/newbashrc "$HOME"/.bashrc
   #cat ~/.bashrc
   export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/"
