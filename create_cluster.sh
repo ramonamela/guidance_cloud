@@ -85,17 +85,19 @@ setup_cluster() {
   echo "[INFO] MASTER NODE WILL RUN IN ${master_ip}"
 
   # Retrieve worker IPs
-  num_workers=$((NUM_NODES - 1 ))
+  num_workers=NUM_NODES
   declare -a worker_ips
-  for (( i=1; i<NUM_NODES; i++ )); do
+  for (( i=0; i<NUM_NODES; i++ )); do
     ip=$("${SCRIPT_DIR}"/create_cluster/get_node_ip.sh "${internal_props_file}" "${i}")
     worker_ips[$i]=${ip}
   done
 
   # Configure master
+  local mem="26"
+  local bucket_dir="/home/${USERNAME}/${BUCKET_NAME}/tmpForCOMPSs"
   scp -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/create_cluster/setup_cluster.sh "${USERNAME}"@"${master_ip}":.
   # shellcheck disable=SC2086  # Array split on purpose
-  ssh -o "StrictHostKeyChecking no" "${USERNAME}"@"${master_ip}" ./setup_cluster.sh "${NODE_CPUS}" "${num_workers}" ${worker_ips[*]}
+  ssh -o "StrictHostKeyChecking no" "${USERNAME}"@"${master_ip}" ./setup_cluster.sh "${NODE_CPUS}" "${mem}" "${bucket_dir}" "${num_workers}" ${worker_ips[*]}
   ev=$?
   if [ "$ev" -ne 0 ]; then
     echo "[ERROR] Cannot setup cluster"
