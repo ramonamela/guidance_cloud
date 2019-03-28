@@ -244,15 +244,18 @@ removeInstance() {
 doSnapshot() {
   local base_instance_name=${1}
   local snapshot_name=${2}
+  #local disk_zone=${3}
+  # TODO: We should compute the disk zone
 
   # Get disk name
   disk_name=$(gcloud compute instances describe "${base_instance_name}" | grep -A5 disk | grep deviceName | awk '{ print $2 }')
 
   # Clean previous snapshot if any
-  if gcloud compute snapshots list | grep -q "${snapshot_name}"; then
+  if gcloud compute snapshots list | grep "${snapshot_name}"; then
     echo "[INFO] Cleaning previous snapshot"
     gcloud compute snapshots delete "${snapshot_name}" -q
   fi
 
+  echo "[INFO] Snapshoting..."
   gcloud compute disks snapshot "${disk_name}" --snapshot-names "${snapshot_name}"
 }
