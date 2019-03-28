@@ -85,7 +85,7 @@ setup_cluster() {
   echo "[INFO] MASTER NODE WILL RUN IN ${master_ip}"
 
   # Retrieve worker IPs
-  num_workers=NUM_NODES
+  num_workers=$NUM_NODES
   declare -a worker_ips
   for (( i=0; i<NUM_NODES; i++ )); do
     ip=$("${SCRIPT_DIR}"/create_cluster/get_node_ip.sh "${internal_props_file}" "${i}")
