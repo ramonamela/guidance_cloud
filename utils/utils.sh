@@ -159,6 +159,12 @@ installGuidanceDependenciesCommands() {
   make
   sudo ln -sf "${minimac_path}"/bin/Minimac3 /usr/bin/minimac3
   cd -
+
+  ## Install fake shapeit
+  cd "${tools_path}"
+  mkdir -p shapeit/bin/
+  touch shapeit/bin/shapeit
+  cd -
 }
 
 installCOMPSsCommands() {
