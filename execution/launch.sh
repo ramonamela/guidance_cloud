@@ -30,6 +30,7 @@ set_env() {
   export QCTOOLBINARY=/usr/bin/qctool1.4
   #export SHAPEITBINARY=/gpfs/home/bsc05/bsc05997/TOOLS/shapeit.v2.r727.linux.x64
   #export SHAPEITBINARY=/gpfs/projects/bsc05/ramon/shapeit.v2.904.3.10.0-693.11.6.el7.x86_64/bin/shapeit
+  export SHAPEITBINARY=/home/guidanceproject2018/bucket-guidance/TOOLS/shapeit/bin/shapeit
   export IMPUTE2BINARY=/usr/bin/impute2
   export SNPTESTBINARY=/usr/bin/snptest_v2.5
   export MINIMAC3BINARY=/usr/bin/minimac3
@@ -46,10 +47,10 @@ set_env() {
 }
 
 run() {
-  jar_file="${SCRIPT_DIR}"/guidance_sha_imp_no.jar
-  cfg_file="${SCRIPT_DIR}"/config_GERA_200_shapeit_impute.file
+  jar_file="${SCRIPT_DIR}"/bucket-guidance/guidance_sha_imp_no.jar
+  cfg_file="${SCRIPT_DIR}"/bucket-guidance/config_GERA_200_shapeit_impute.file
 
-  debug=off
+  debug=off # debug
   graph=true
   tracing=false
   
