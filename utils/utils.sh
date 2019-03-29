@@ -189,7 +189,7 @@ installCOMPSsCommands() {
   
   # Download and Install COMPSs
   local compss_version="2.4"
-  local compss_path="$HOME"/"${compss_version}"
+  local compss_path="$HOME/compss"
   
   ## Setup bash environment
   echo "export JAVA_HOME=\"/usr/lib/jvm/java-8-openjdk-amd64/\"" > "$HOME"/newbashrc
@@ -201,7 +201,7 @@ installCOMPSsCommands() {
   # Download COMPSs
   sudo rm -rf "${compss_path}"
   cd "$HOME"
-  git clone https://github.com/bsc-wdc/compss.git "${compss_version}"
+  git clone --branch "${compss_version}" https://github.com/bsc-wdc/compss.git
   cd "${compss_path}"
   ./submodules_get.sh
   ./submodules_patch.sh
@@ -209,7 +209,7 @@ installCOMPSsCommands() {
   
   # Install COMPSs
   cd "${compss_path}"/builders
-  sudo -E ./buildlocal -M -B -A
+  sudo -E ./buildlocal -M -B -P
   cd -
 }
   
