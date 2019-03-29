@@ -19,7 +19,7 @@ set_env() {
   export PLINKBINARY=/usr/bin/plink
   export EAGLEBINARY=/usr/bin/eagle
   export QCTOOLBINARY=/usr/bin/qctool1.4
-  export SHAPEITBINARY=/home/guidanceproject2018/TOOLS/shapeit/bin/shapeit
+  export SHAPEITBINARY=/usr/bin/shapeit
   export IMPUTE2BINARY=/usr/bin/impute2
   export SNPTESTBINARY=/usr/bin/snptest_v2.5
   export MINIMAC3BINARY=/usr/bin/minimac3

@@ -160,11 +160,16 @@ installGuidanceDependenciesCommands() {
   sudo ln -sf "${minimac_path}"/bin/Minimac3 /usr/bin/minimac3
   cd -
 
-  ## Install fake shapeit
+  ## Install shapeit
+  local shapeit_name="shapeit.v2.904.2.6.32-696.18.7.el6.x86_64"
+  local shapeit_tgz="shapeit.v2.r904.glibcv2.12.linux.tar.gz"
+  local shapeit_path="${tools_path}"/"${shapeit_name}"
   cd "${tools_path}"
-  mkdir -p shapeit/bin/
-  touch shapeit/bin/shapeit
-  cd -
+  wget https://mathgen.stats.ox.ac.uk/genetics_software/shapeit/"${shapeit_tgz}"
+  tar -zxvf "${shapeit_tgz}"
+  rm "${shapeit_tgz}"
+  chmod -R 775 "${shapeit_path}"
+  sudo ln -sf "${shapeit_path}/bin/shapeit" /usr/bin/shapeit
 }
 
 installCOMPSsCommands() {
