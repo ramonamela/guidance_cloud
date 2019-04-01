@@ -201,7 +201,7 @@ createBaseInstance() {
     --image "${ubuntu_image}" \
     --image-project ubuntu-os-cloud \
     --boot-disk-type pd-standard \
-    --boot-disk-size 1000GB \
+    --boot-disk-size 500GB \
     --boot-disk-device-name "${instance_name}" \
     --service-account "${service_account}"
 }
