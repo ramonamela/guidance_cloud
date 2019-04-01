@@ -123,14 +123,15 @@ deploy_files() {
     exit $ev
   fi
 
-  scp -v -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/execution/env_execution.sh "${USERNAME}@${master_ip}:/home/${USERNAME}/${BUCKET_NAME}/"
+  # Overrides default image environment scripts
+  scp -v -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/execution/env_execution.sh "${USERNAME}@${master_ip}:/home/${USERNAME}/"
   ev=$?
   if [ "$ev" -ne 0 ]; then
     echo "[ERROR] Cannot deploy set_environment script"
     exit $ev
   fi
 
-  scp -v -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/execution/env.sh "${USERNAME}@${master_ip}:/home/${USERNAME}/${BUCKET_NAME}/"
+  scp -v -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/execution/env.sh "${USERNAME}@${master_ip}:/home/${USERNAME}/"
   ev=$?
   if [ "$ev" -ne 0 ]; then
     echo "[ERROR] Cannot deploy set_environment script"

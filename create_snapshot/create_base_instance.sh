@@ -144,6 +144,10 @@ create_base_instance() {
   # Look into GCSFuse and https://github.com/s3fs-fuse/s3fs-fuse/wiki/Fuse-Over-Amazon
   echo "[INFO] Mounting FUSE..."
   ssh -q -o "StrictHostKeyChecking no" "${USERNAME}"@"${CURRENT_IP}" "cat /etc/fuse.conf | grep -v user_allow_other > tmp.conf;echo user_allow_other >> tmp.conf;sudo mv tmp.conf /etc/fuse.conf"
+
+  # Install execution environment
+  scp -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/../execution/env.sh "${USERNAME}"@"${CURRENT_IP}":.
+  scp -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/../execution/env_execution.sh "${USERNAME}"@"${CURRENT_IP}":.
   
   # Install Guidance dependencies
   echo "[INFO] Install Guidance dependencies..."

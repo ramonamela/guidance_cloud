@@ -30,7 +30,7 @@ set_env() {
   # Guidance execution env variables
   # shellcheck source=./env_execution.sh
   # shellcheck disable=SC1091
-  source /home/guidanceproject2018/bucket-guidance/env_execution.sh
+  source /home/guidanceproject2018/env_execution.sh
 }
 
 

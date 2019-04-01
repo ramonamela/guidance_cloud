@@ -200,7 +200,7 @@ installCOMPSsCommands() {
   echo "# Injected by GUIDANCE-COMPSs setup" >> "$HOME"/newbashrc
   # TODO: File paths should be parametrized
   echo "export JAVA_HOME=\"/usr/lib/jvm/java-8-openjdk-amd64/\"" > "$HOME"/newbashrc
-  echo "source /home/guidanceproject2018/bucket-guidance/env.sh" >> "$HOME"/newbashrc
+  echo "source /home/guidanceproject2018/env.sh" >> "$HOME"/newbashrc
   echo "" >> "$HOME"/newbashrc
   grep -v "JAVA_HOME" "$HOME"/.bashrc >> "$HOME"/newbashrc
   mv "$HOME"/newbashrc "$HOME"/.bashrc
