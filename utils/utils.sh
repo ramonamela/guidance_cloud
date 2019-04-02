@@ -47,6 +47,11 @@ installGuidanceDependenciesCommands() {
   sudo apt-get install -y --no-install-recommends g++-6 gcc-6
   sudo ln -sf /usr/bin/gcc-6 /usr/bin/gcc
   sudo ln -sf /usr/bin/g++-6 /usr/bin/g++
+
+  # Install R dependencies
+  sudo apt-get install -y --no-install-recommends libcurl4-openssl-dev jags libpq libmariadbclient-dev libmariadb-client-lgpl-dev
+  # TODO: Install R dependencies (need to deploy deps.R script)
+  #Rscript deps.R
   
   # Install Guidance tools
   
@@ -197,11 +202,14 @@ installCOMPSsCommands() {
   local compss_path="$HOME/compss"
   
   ## Setup bash environment
-  echo "# Injected by GUIDANCE-COMPSs setup" >> "$HOME"/newbashrc
   # TODO: File paths should be parametrized
-  echo "export JAVA_HOME=\"/usr/lib/jvm/java-8-openjdk-amd64/\"" > "$HOME"/newbashrc
-  echo "source /home/guidanceproject2018/env.sh" >> "$HOME"/newbashrc
-  echo "" >> "$HOME"/newbashrc
+  cat << EOF > "$HOME"/newbashrc
+# Injected by GUIDANCE-COMPSs setup
+export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/"
+source /home/guidanceproject2018/env.sh
+# End Injected GUIDANCE-COMPSs setup
+
+EOF
   grep -v "JAVA_HOME" "$HOME"/.bashrc >> "$HOME"/newbashrc
   mv "$HOME"/newbashrc "$HOME"/.bashrc
   #cat ~/.bashrc
