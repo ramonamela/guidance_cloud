@@ -1,0 +1,8 @@
+install.packages("data.table", dependencies=TRUE)
+install.packages("plyr", dependencies=TRUE)
+install.packages("dplyr", dependencies=TRUE)
+install.packages("reshape", dependencies=TRUE)
+install.packages("IRanges", dependencies=TRUE)
+install.packages("library", dependencies=TRUE)
+install.packages("gap", dependencies=TRUE)
+install.packages("sfsmisc", dependencies=TRUE)
