@@ -14,7 +14,7 @@ set_env() {
 
   # Guidance binary locations
   export BCFTOOLSBINARY=/usr/bin/bcftools
-  export RSCRIPTBINDIR=/usr/bin/R
+  export RSCRIPTBINDIR=/usr/bin
   export SAMTOOLSBINARY=/usr/bin/samtools
   export PLINKBINARY=/usr/bin/plink
   export EAGLEBINARY=/usr/bin/eagle
