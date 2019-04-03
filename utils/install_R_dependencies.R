@@ -1,10 +1,39 @@
-install.packages("data.table", dependencies=TRUE)
-install.packages("plyr", dependencies=TRUE)
-install.packages("dplyr", dependencies=TRUE)
-install.packages("reshape", dependencies=TRUE)
-install.packages("library", dependencies=TRUE)
-install.packages("gap", dependencies=TRUE)
-install.packages("sfsmisc", dependencies=TRUE)
-if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-BiocManager::install("IRanges", version = "3.8")
+# Define packages to install
+std_packages <- c("data.table", "plyr", "dplyr", "reshape", "library", "gap", "sfsmisc")
+bioc_packages <- c("IRanges")
+
+# Define R library path
+rLibPath <- paste0(path.expand("~"), "/R/")
+print(paste0("Installing libraries at ", rLibPath))
+.libPaths(rLibPath)
+
+# Update current packages
+print("Updating packages...")
+update.packages(repos="https://ftp.cixug.es/CRAN/", lib=rLibPath)
+
+# Install BiocManager
+print("Installing BiocManager...")
+install.packages("BiocManager", dependencies=TRUE, repos="https://ftp.cixug.es/CRAN/", lib=rLibPath)
+
+# Install STD packages
+print("Installing Standard R Packages...")
+for(pack in std_packages) {
+  print(paste0("Installing ", pack))
+  install.packages(pack, dependencies=TRUE, repos="https://ftp.cixug.es/CRAN/", lib=rLibPath)
+  if ( ! library(pack, character.only=TRUE, logical.return=TRUE) ) {
+    quit(status=1, save="no")
+  }
+}
+
+# Install BiocManager packages
+print("Installing BiocManager Packages...")
+for (pack in bioc_packages) {
+  print(paste0("Installing ",pack))
+  BiocManager::install(pack, lib=rLibPath)
+  if ( ! library(pack, character.only=TRUE, logical.return=TRUE) ) {
+    quit(status=1, save="no")
+  }
+}
+
+# Done
+print("ALL DONE")

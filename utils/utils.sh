@@ -50,8 +50,7 @@ installGuidanceDependenciesCommands() {
 
   # Install R dependencies
   sudo apt-get install -y --no-install-recommends libcurl4-openssl-dev jags libpq libmariadbclient-dev libmariadb-client-lgpl-dev
-  # TODO: Install R dependencies (need to deploy deps.R script)
-  #Rscript deps.R
+  Rscript ./install_R_dependencies.R
   
   # Install Guidance tools
   
@@ -166,6 +165,7 @@ installGuidanceDependenciesCommands() {
   cd -
 
   ## Install shapeit
+  # TODO: Deploy correct shapeit version
   local shapeit_name="shapeit.v2.904.2.6.32-696.18.7.el6.x86_64"
   local shapeit_tgz="shapeit.v2.r904.glibcv2.12.linux.tar.gz"
   local shapeit_path="${tools_path}"/"${shapeit_name}"
@@ -247,8 +247,10 @@ installGuidanceDependencies() {
   local username=${1}
   local ip=${2}
   
+  scp -o "StrictHostKeyChecking no" "${username}"@"${ip}":. "${SCRIPT_DIR}"/utils/install_R_dependencies.R
   # shellcheck disable=SC2029
   ssh -o "StrictHostKeyChecking no" "${username}"@"${ip}" "$(typeset -f); installGuidanceDependenciesCommands"
+  ssh -o "StrictHostKeyChecking no" "${username}"@"${ip}" rm ./install_R_dependencies.R
 }
   
 installCOMPSs() {
