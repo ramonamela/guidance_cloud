@@ -2,7 +2,7 @@
 [![Language](https://img.shields.io/badge/language-bash-green.svg)](https://img.shields.io/badge/language-bash-green.svg)
 
 <!-- Repository License -->
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/cristianrcv/pycompss-pluto/blob/master/LICENSE)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/ramonamela/guidance_cloud/blob/master/LICENSE)
 
 
 # Cloud Utils
@@ -35,7 +35,7 @@ submit a pull request or contact the author if necessary.
 
 ## Disclaimer
 
-This is part of a collaboration between the Earth Sciences department and the [Workflows and Distributed Computing Team][wdc-bsc] group at the [BSC][bsc] and is still
+This is part of a collaboration between the [Computational Genomics][cg-bsc] and the [Workflows and Distributed Computing Team][wdc-bsc] group at the [BSC][bsc] and is still
 under development. 
 
 
@@ -45,6 +45,7 @@ Licensed under the [Apache 2.0 License][apache-2]
 
 
 [wdc-bsc]: https://www.bsc.es/discover-bsc/organisation/scientific-structure/workflows-and-distributed-computing
+[cg-bsc]: https://www.bsc.es/discover-bsc/organisation/scientific-structure/computational-genomics
 [bsc]: https://www.bsc.es/
 
 [apache-2]: http://www.apache.org/licenses/LICENSE-2.0
