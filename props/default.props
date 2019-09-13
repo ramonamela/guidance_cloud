@@ -1,15 +1,16 @@
 ## General project information
-USERNAME="guidanceproject2018"
+USERNAME="computational.genomics.bsc"
 PUBLIC_SSH_FILE="${HOME}/.ssh/id_rsa.pub"
 PROJECT_NAME="guidance"
-IDENTIFICATION_JSON="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )/../guidance-06986d1d6789.json"
+IDENTIFICATION_JSON="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )/../guidance-252716-1d06ddd7a8f3.json"
 
 ## Base instance information
 BASE_INSTANCE_NAME="guidancebase"
 OVERRIDE_INSTANCE="true"
 
 ## Bucket information
-BUCKET_NAME="bucket-${PROJECT_NAME}"
+#BUCKET_NAME="bucket-${PROJECT_NAME}"
+BUCKET_NAME="bucket-computational-genomics"
 
 ## Snapshot name
 SNAPSHOT_NAME="snap${PROJECT_NAME}"

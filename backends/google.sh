@@ -28,7 +28,8 @@ initSession() {
 
 # Sets the GCloud project name
 setProjectName() {
-  local project_name=${1}
+  local project_name
+  project_name=$(gcloud auth list 2>&1 | grep "\*" | awk '{ print $2 }' | tr "@" "\t" | awk '{ print $2 }' | sed "s/.iam.gserviceaccount.com//")
 
   gcloud config set project "${project_name}"
 }

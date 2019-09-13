@@ -7,7 +7,7 @@
 
 # Cloud Utils
 
-Utils to configure Guidance and COMPSS in a cloud environment.
+Utils to configure Guidance and COMPSs in a cloud environment.
 
 ---
 
