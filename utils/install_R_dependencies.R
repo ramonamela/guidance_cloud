@@ -1,5 +1,6 @@
 # Define packages to install
-std_packages <- c("data.table", "plyr", "dplyr", "reshape", "library", "gap", "sfsmisc")
+#std_packages <- c("data.table", "plyr", "dplyr", "reshape", "library", "gap", "sfsmisc")
+std_packages <- c("data.table", "plyr", "dplyr", "reshape", "gap", "sfsmisc")
 bioc_packages <- c("IRanges")
 
 # Define R library path
@@ -13,6 +14,7 @@ update.packages(repos="https://ftp.cixug.es/CRAN/", lib=rLibPath)
 
 # Install BiocManager
 print("Installing BiocManager...")
+update.packages(ask=FALSE)
 install.packages("BiocManager", dependencies=TRUE, repos="https://ftp.cixug.es/CRAN/", lib=rLibPath)
 
 # Install STD packages

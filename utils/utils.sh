@@ -38,18 +38,44 @@ installBasicDependenciesCommands() {
 installGuidanceDependenciesCommands() {
   # Enable error manager
   set -e
-  
+
+  #sudo add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu xenial-cran35/'
+  #sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9
+  export DEBIAN_FRONTEND=noninteractive
+  sudo apt-get update
+  sudo apt install -y --no-install-recommends apt-transport-https
+
+  #sudo add-apt-repository -y ppa:marutter/c2d4u3.5
+  #sudo apt-get update
+
   # Install base dependencies
   sudo apt-get update
   sudo apt-get install -y --no-install-recommends apt-utils vim
-  sudo bash -c "export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends r-base make git"
+  #DEBIAN_FRONTEND=noninteractive sudo apt-get install -yq --no-install-recommends tzdata
+  #sudo bash -c "export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends r-base-core make git r-cran-rjags"
+
+  export DEBIAN_FRONTEND=noninteractive && \
+#    sudo add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/' && \
+#    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9 && \
+  DEBIAN_FRONTEND=noninteractive sudo apt-get update && sudo apt-get install -y --no-install-recommends gnupg2 software-properties-common && \
+  sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9 && \
+  sudo add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/' && \
+  sudo apt-get update && DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends apt-utils && \
+  sudo sed -i 's/^mesg n$/tty -s \&\& mesg n/g' /root/.profile && \
+  sudo bash -c "export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends r-base r-base-dev r-base-core libcurl4-openssl-dev jags libpq-dev libmariadb-client-lgpl-dev"
+
+  #sudo add-apt-repository -y ppa:marutter/c2d4u3.5
+  #sudo apt-get update
+  #sudo apt-get install r-cran-rjags
+
   sudo apt-get remove -y g++ gcc
-  sudo apt-get install -y --no-install-recommends g++-6 gcc-6
-  sudo ln -sf /usr/bin/gcc-6 /usr/bin/gcc
-  sudo ln -sf /usr/bin/g++-6 /usr/bin/g++
+  sudo apt-get install -y --no-install-recommends g++-7 gcc-7 gfortran-7
+  sudo ln -sf /usr/bin/gcc-7 /usr/bin/gcc
+  sudo ln -sf /usr/bin/g++-7 /usr/bin/g++
+  sudo ln -sf /usr/bin/gfortran-7 /usr/bin/gfortran
 
   # Install R dependencies
-  sudo apt-get install -y --no-install-recommends libcurl4-openssl-dev jags libpq libmariadbclient-dev libmariadb-client-lgpl-dev
+  DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends libcurl4-openssl-dev jags libpq-dev libmariadbclient-dev libmariadb-client-lgpl-dev libssl-dev libblas-dev liblapack-dev libatlas-base-dev
   Rscript ./install_R_dependencies.R
   
   # Install Guidance tools
@@ -152,7 +178,7 @@ installGuidanceDependenciesCommands() {
   chmod -R 755 "${snp_path}"
   sudo ln -sf "${snp_path}"/snptest_v2.5 /usr/bin/snptest_v2.5
   
-  ## Install MINIMAC
+  ## Install MINIMAC3
   local minimac_name="Minimac3"
   local minimac_path="${tools_path}"/"${minimac_name}"
   sudo -E apt-get install -y --no-install-recommends libssl-dev zlib1g-dev
@@ -160,8 +186,25 @@ installGuidanceDependenciesCommands() {
   cd "${tools_path}"
   git clone https://github.com/Santy-8128/"${minimac_name}".git
   cd "${minimac_name}"
+  sed -i 's/ -Werror//' ./Library/libStatGenForMinimac3/general/Makefile
   make
   sudo ln -sf "${minimac_path}"/bin/Minimac3 /usr/bin/minimac3
+  cd -
+
+  ## Install MINIMAC4
+  local minimac_4_name="Minimac4"
+  local minimac_4_path="${tools_path}"/"${minimac_4_name}"
+  sudo -E apt-get install -y --no-install-recommends cmake python-pip python-dev build-essential
+  pip install wheel
+  pip install setuptools
+  pip install cget
+  
+  cd "${tools_path}"
+  git clone https://github.com/Santy-8128/"${minimac_4_name}".git
+  cd "${minimac_4_name}"
+  #sed -i 's/ -Werror//' ./Library/libStatGenForMinimac3/general/Makefile
+  bash install.sh
+  sudo ln -sf "${minimac_path}"/release-build/minimac4 /usr/bin/minimac4
   cd -
 
   ## Install shapeit
@@ -194,11 +237,11 @@ installCOMPSsCommands() {
   sudo apt-get -y --no-install-recommends install graphviz xdg-utils
   sudo apt-get -y --no-install-recommends install libtool automake build-essential
   sudo bash -c "export DEBIAN_FRONTEND=noninteractive && apt-get install -y --no-install-recommends openssh-server openssh-client"
-  sudo apt-get -y --no-install-recommends install libxml2 libxml2-dev gfortran libpapi-dev papi-tools
+  sudo apt-get -y --no-install-recommends install libxml2 libxml2-dev gfortran-7 libpapi-dev papi-tools
   sudo apt-get -y --no-install-recommends install openmpi-bin openmpi-doc libopenmpi-dev uuid-runtime curl bc git
   
   # Download and Install COMPSs
-  local compss_version="2.4"
+  local compss_version="exaqute"
   local compss_path="$HOME/compss"
   
   ## Setup bash environment
@@ -206,7 +249,7 @@ installCOMPSsCommands() {
   cat << EOF > "$HOME"/newbashrc
 # Injected by GUIDANCE-COMPSs setup
 export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/"
-source /home/guidanceproject2018/env.sh
+source "${HOME}"/env.sh
 # End Injected GUIDANCE-COMPSs setup
 
 EOF
@@ -247,9 +290,9 @@ installGuidanceDependencies() {
   local username=${1}
   local ip=${2}
   
-  scp -o "StrictHostKeyChecking no" "${username}"@"${ip}":. "${SCRIPT_DIR}"/utils/install_R_dependencies.R
+  scp -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/../utils/install_R_dependencies.R "${username}"@"${ip}":.
   # shellcheck disable=SC2029
-  ssh -o "StrictHostKeyChecking no" "${username}"@"${ip}" "$(typeset -f); installGuidanceDependenciesCommands"
+  ssh -o "StrictHostKeyChecking no" "${username}"@"${ip}" "$(typeset -f); mkdir /home/${username}/R/; installGuidanceDependenciesCommands"
   ssh -o "StrictHostKeyChecking no" "${username}"@"${ip}" rm ./install_R_dependencies.R
 }
   

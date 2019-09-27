@@ -5,3 +5,5 @@
 *.json
 
 test_create_snapshot.sh
+install_out.*
+cluster*

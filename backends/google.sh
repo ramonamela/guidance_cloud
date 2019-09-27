@@ -193,7 +193,9 @@ createBaseInstance() {
   local project_name=${3}
   local zone=${4}
 
-  local ubuntu_image="ubuntu-minimal-1810-cosmic-v20190122"
+  #local ubuntu_image="ubuntu-minimal-1810-cosmic-v20190628"
+  local ubuntu_image="ubuntu-minimal-1804-bionic-v20190911"
+  #local ubuntu_image="ubuntu-1804-bionic-v20190911"
   #local ubuntu_image="ubuntu-minimal-1804-lts"
 
   gcloud compute instances create "${instance_name}" \
