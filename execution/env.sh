@@ -23,14 +23,15 @@ set_env() {
   export IMPUTE2BINARY=/usr/bin/impute2
   export SNPTESTBINARY=/usr/bin/snptest_v2.5
   export MINIMAC3BINARY=/usr/bin/minimac3
+  export MINIMAC4BINARY=/usr/bin/minimac4
   #export MINIMAC4BINARY=/apps/MINIMAC4/1.0.0/INTEL/bin/minimac4
 
-  export RSCRIPTDIR=/home/guidanceproject2018/bucket-guidance/R_SCRIPTS/
+  export RSCRIPTDIR="${HOME}"/bucket-guidance/R_SCRIPTS/
 
   # Guidance execution env variables
   # shellcheck source=./env_execution.sh
   # shellcheck disable=SC1091
-  source /home/guidanceproject2018/env_execution.sh
+  source "${HOME}"/env_execution.sh
 }
 
 
