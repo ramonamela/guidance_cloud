@@ -241,7 +241,7 @@ installCOMPSsCommands() {
   sudo apt-get -y --no-install-recommends install openmpi-bin openmpi-doc libopenmpi-dev uuid-runtime curl bc git
   
   # Download and Install COMPSs
-  local compss_version="exaqute"
+  local compss_version="guidance"
   local compss_path="$HOME/compss"
   
   ## Setup bash environment
