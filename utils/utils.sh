@@ -269,7 +269,7 @@ EOF
   
   # Install COMPSs
   cd "${compss_path}"/builders
-  sudo -E ./buildlocal -M -B -P
+  sudo -E ./buildlocal -M -B -P -A -K
   cd -
 }
   
@@ -294,6 +294,26 @@ installGuidanceDependencies() {
   # shellcheck disable=SC2029
   ssh -o "StrictHostKeyChecking no" "${username}"@"${ip}" "$(typeset -f); mkdir /home/${username}/R/; installGuidanceDependenciesCommands"
   ssh -o "StrictHostKeyChecking no" "${username}"@"${ip}" rm ./install_R_dependencies.R
+
+  ssh -o "StrictHostKeyChecking no" "${username}"@"${ip}" git clone https://github.com/ramonamela/guidance_R_scripts.git "${HOME}"/R_SCRIPT
+
+  tmpfile=$(mktemp)
+  filename=$(basename -- ${tmpfile})
+  cat << "EOF" > "${tmpfile}"
+  
+  git clone --branch 0.1.1 "https://github.com/ramonamela/guidance.git" guidance
+  pushd guidance
+  mvn clean install
+  cp guidance.jar ${HOME}
+  cp -r ./src/main/R ${HOME}/R_SCRIPTS
+  popd
+  rm -rf guidance
+    
+EOF
+
+  scp -o "StrictHostKeyChecking no" "${tmpfile}" "${username}"@"${ip}":/home/"${username}/${filename}"
+  ssh -o "StrictHostKeyChecking no" "${username}"@"${ip}" "bash /home/${username}/${filename};rm /home/${username}/${filename}"
+  rm ${tmpfile}
 }
   
 installCOMPSs() {
