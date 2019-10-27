@@ -261,7 +261,7 @@ installCOMPSsCommands() {
   cat << EOF > "$HOME"/newbashrc
 # Injected by GUIDANCE-COMPSs setup
 export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/"
-source "${HOME}"/env.sh
+source ${HOME}/env.sh
 # End Injected GUIDANCE-COMPSs setup
 
 EOF

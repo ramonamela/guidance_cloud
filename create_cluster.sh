@@ -23,6 +23,10 @@ SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
 #
 
 create_cluster() {
+
+  # Init session
+  "${SCRIPT_DIR}"/create_cluster/init_session.sh "${internal_props_file}"
+
   echo "[INFO] Creating cluster with ${NUM_NODES} nodes"
 
   # Launch create_node in parallel
@@ -81,7 +85,7 @@ setup_cluster() {
 
   # Retrieve master IP
   local master_ip
-  master_ip=$("${SCRIPT_DIR}"/create_cluster/get_node_ip.sh "${internal_props_file}" 0)
+  master_ip=$("${SCRIPT_DIR}"/create_cluster/get_node_ip.sh "${internal_props_file}" -1)
   echo "[INFO] MASTER NODE WILL RUN IN ${master_ip}"
 
   # Retrieve worker IPs
@@ -95,6 +99,7 @@ setup_cluster() {
   # Configure master
   local mem="26"
   local bucket_dir="/home/${USERNAME}/${BUCKET_NAME}/tmpForCOMPSs"
+  local bucket_dir="/tmp"
   scp -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/create_cluster/setup_cluster.sh "${USERNAME}"@"${master_ip}":.
   # shellcheck disable=SC2086  # Array split on purpose
   ssh -o "StrictHostKeyChecking no" "${USERNAME}"@"${master_ip}" ./setup_cluster.sh "${NODE_CPUS}" "${mem}" "${bucket_dir}" "${num_workers}" ${worker_ips[*]}
@@ -112,11 +117,11 @@ setup_cluster() {
 deploy_files() {
   # Retrieve master IP
   local master_ip
-  master_ip=$("${SCRIPT_DIR}"/create_cluster/get_node_ip.sh "${internal_props_file}" 0)
+  master_ip=$("${SCRIPT_DIR}"/create_cluster/get_node_ip.sh "${internal_props_file}" -1)
 
   # Deploy execution scripts
   echo "[INFO] Deploying execution scripts to ${master_ip}..."
-  scp -v -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/execution/launch.sh "${USERNAME}@${master_ip}:/home/${USERNAME}/"
+  scp -v -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/execution/launch.sh "${USERNAME}@${master_ip}:/home/${USERNAME}/launch.sh"
   ev=$?
   if [ "$ev" -ne 0 ]; then
     echo "[ERROR] Cannot deploy launch script"
@@ -124,14 +129,14 @@ deploy_files() {
   fi
 
   # Overrides default image environment scripts
-  scp -v -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/execution/env_execution.sh "${USERNAME}@${master_ip}:/home/${USERNAME}/"
+  scp -v -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/execution/env_execution.sh "${USERNAME}@${master_ip}:/home/${USERNAME}/env_execution.sh"
   ev=$?
   if [ "$ev" -ne 0 ]; then
     echo "[ERROR] Cannot deploy set_environment script"
     exit $ev
   fi
 
-  scp -v -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/execution/env.sh "${USERNAME}@${master_ip}:/home/${USERNAME}/"
+  scp -v -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/execution/env.sh "${USERNAME}@${master_ip}:/home/${USERNAME}/env.sh"
   ev=$?
   if [ "$ev" -ne 0 ]; then
     echo "[ERROR] Cannot deploy set_environment script"

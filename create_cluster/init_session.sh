@@ -20,14 +20,13 @@ set -u # Exit when undefined variable
 #
 
 get_args() {
-  if [ $# -ne 2 ]; then
+  if [ $# -ne 1 ]; then
     echo "[ERROR] Incorrect number of parameters"
-    echo "  Usage: $0 <internal_props_file> <node_id>"
+    echo "  Usage: $0 <internal_props_file>"
     exit 1
   fi
 
   internal_props_file=$1
-  node_id=$2
 }
 
 check_and_load_args() {
@@ -78,19 +77,27 @@ check_and_load_args() {
 }
 
 
-get_node_ip() {
-  local node_zone
-  local node_name
-  node_zone=$(getBucketZone "${BUCKET_NAME}") # "us-east1-c"
-  if [[ "${node_id}" == -1 ]]; then
-    node_name="${CLUSTER_INSTANCE_NAME}$(printf %04d "0")"
-    node_ip=$(getIP "${node_name}" "${node_zone}")
-  else
-    node_name="${CLUSTER_INSTANCE_NAME}$(printf %04d "${node_id}")"
-    node_ip=$(getPrivateIP "${node_name}" "${node_zone}")
-  fi
+init_session() {
+  # Initialize backend session
+  echo "[INFO] Initializing session backend..."
+  initSession "${IDENTIFICATION_JSON}"
 
-  echo "${node_ip}"
+  # Set project name
+  echo "[INFO] Setting project name in backend..."
+  setProjectName "${PROJECT_NAME}"
+
+  # Retrieve basic information
+  echo "[INFO] Retrieving basic information..."
+  local bucket_location
+  local bucket_zone
+  local service_account
+  bucket_location=$(getBucketLocation "${BUCKET_NAME}")
+  bucket_zone=$(getBucketZone "${BUCKET_NAME}")
+  service_account=$(getServiceAccountFromJSON "${IDENTIFICATION_JSON}")
+
+  # Set project properties
+  echo "[INFO] Setting cloud project properties..."
+  setProjectProperties "${bucket_location}"
 }
 
 
@@ -105,8 +112,8 @@ main() {
   # Check arguments
   check_and_load_args
 
-  # Get node ip
-  get_node_ip
+  # Initialize session
+  init_session
 }
 
 

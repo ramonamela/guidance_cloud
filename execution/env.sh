@@ -26,12 +26,13 @@ set_env() {
   export MINIMAC4BINARY=/usr/bin/minimac4
   #export MINIMAC4BINARY=/apps/MINIMAC4/1.0.0/INTEL/bin/minimac4
 
-  export RSCRIPTDIR='${HOME}'/R_SCRIPTS/
+  export RSCRIPTDIR="${HOME}"/R_SCRIPTS/
+  export R_LIBS="~/R"
 
   # Guidance execution env variables
   # shellcheck source=./env_execution.sh
   # shellcheck disable=SC1091
-  source '${HOME}'/env_execution.sh
+  source "${HOME}"/env_execution.sh
 }
 
 

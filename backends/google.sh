@@ -136,6 +136,15 @@ getIP() {
   echo "${current_ip}"
 }
 
+# Echoes the VM private IP
+getPrivateIP() {
+  local instance_name=$1
+  local zone=$2
+
+  current_ip=$(gcloud compute instances list --filter=zone:"${zone}" | grep "${instance_name}" | awk '{ print $4 }')
+  echo "${current_ip}"
+}
+
 
 #
 # Disk methods

@@ -10,18 +10,18 @@ print(paste0("Installing libraries at ", rLibPath))
 
 # Update current packages
 print("Updating packages...")
-update.packages(repos="https://ftp.cixug.es/CRAN/", lib=rLibPath)
+update.packages(lib=rLibPath)
 
 # Install BiocManager
 print("Installing BiocManager...")
-update.packages(ask=FALSE)
-install.packages("BiocManager", dependencies=TRUE, repos="https://ftp.cixug.es/CRAN/", lib=rLibPath)
+update.packages(ask=FALSE, lib=rLibPath)
+install.packages("BiocManager", dependencies=TRUE, lib=rLibPath)
 
 # Install STD packages
 print("Installing Standard R Packages...")
 for(pack in std_packages) {
   print(paste0("Installing ", pack))
-  install.packages(pack, dependencies=TRUE, repos="https://ftp.cixug.es/CRAN/", lib=rLibPath)
+  install.packages(pack, dependencies=TRUE, lib=rLibPath)
   if ( ! library(pack, character.only=TRUE, logical.return=TRUE) ) {
     quit(status=1, save="no")
   }
