@@ -59,11 +59,7 @@ qq.plot <- function(tab,lambda=T,stat,BA=F,plot=T,mod,
     
     #Scaling Size dots
     scale.fact <- 0.25
-    my.cex <- scale.fact * pvals * 0.9;
-    my.cex[pvals > -log10((5e-3)-pval_threshold)] <- 0.2 * pvals[pvals > -log10((5e-3)-pval_threshold)] * 0.9;
-    my.cex[pvals > -log10((5e-5)-pval_threshold)] <- 0.15 * pvals[pvals > -log10((5e-5)-pval_threshold)] * 0.9;
-    my.cex[pvals > -log10(pval_threshold)] <- 0.1 * pvals[pvals > -log10(pval_threshold)] * 0.9;
-    my.cex[pvals > -log10(pval_threshold-(5e-20))] <- 0.05 * pvals[pvals > -log10(pval_threshold-(5e-20))] * 0.9;
+    my.cex <- scale.fact * pvals * 0.9
     ylab <- expression(-log[10]~italic(p)[Obs])
     xlab <- expression(-log[10]~italic(p)[Exp])
     max.xaxis <- max(p.exp) + 1
@@ -89,13 +85,14 @@ qq.plot <- function(tab,lambda=T,stat,BA=F,plot=T,mod,
     points(p.exp[col == "ivory3"], pvals[col=="ivory3"], pch=18, cex=my.cex[col=="ivory3"], col="ivory3")
 
     #legend files
-    mtext(substitute(paste(lambda~" = "~lfac),list(lfac=round(l.fac,digits=3))),at=c(max.xaxis*0.5,max.yaxis*0.5),line=1,adj=0.5,cex=0.9)
+
+    mtext(substitute(paste(lambda~" = "~lfac),list(lfac=round(l.fac,digits=3))),line=1,adj=0.5,cex=0.9)
 }
 
 
 manhattan <- function(dataframe, colors=c("lightsteelblue4","lightyellow2"), 
                       ymin=0, ymax="max", limitchromosomes=1:25, 
-                      suggestiveline=-log10(1e-5), 
+                      suggestiveline=-log10(pval_threshold/0.005), 
                       genomewideline=-log10(pval_threshold), 
                       annotate=NULL, ...) {
    d=dataframe
@@ -108,7 +105,7 @@ manhattan <- function(dataframe, colors=c("lightsteelblue4","lightyellow2"),
    d$pos=NA
    ticks=NULL
    lastbase=0
-   colors <- c(rep(colors,24)[1:24],"lightsteelblue4")
+   colors <- c(rep(colors,25)[1:25],"lightsteelblue4")
 
    if (ymax=="max") {ymax<-ceiling(max(d$logp))}
    	ymax<-as.numeric(ymax)
@@ -128,7 +125,7 @@ manhattan <- function(dataframe, colors=c("lightsteelblue4","lightyellow2"),
                         if (i==as.vector(unique(d$chr))[1]) {
                                 d[d$chr==i, ]$pos=d[d$chr==i, ]$position
                         } else {
-                                lastbase=lastbase+tail(subset(d,chr==i-1)$position, 1)
+                                lastbase=lastbase+tail(subset(d,chr==as.vector(unique(d$chr))[which(as.vector(unique(d$chr))==i)-1])$position, 1)
                                 d[d$chr==i, ]$pos=d[d$chr==i, ]$position+lastbase
                         }
                         ticks=c(ticks, d[d$chr==i, ]$pos[floor(length(d[d$chr==i, ]$pos)/2)+1])
@@ -138,11 +135,12 @@ manhattan <- function(dataframe, colors=c("lightsteelblue4","lightyellow2"),
 		chr <- unique(d$chr)
 		if (23 %in% chr){ 	
 			ticks[(length(ticks))]
-			ticks[(length(ticks)-1)]
-			ticks2 <- c(ticks[(length(ticks))],ticks[(length(ticks)-1)])
+			ticks[(length(ticks)-2)]
+			ticks2 <- c(ticks[(length(ticks))],ticks[(length(ticks)-2)])
 
 		    d$chr[d$chr=="23"] <- as.character("F")		
 		    d$chr[d$chr=="24"] <- as.character("M")
+            d$chr[d$chr=="25"] <- as.character("A")
 		}
 
         if (numchroms==1) {
@@ -150,12 +148,15 @@ manhattan <- function(dataframe, colors=c("lightsteelblue4","lightyellow2"),
                         xlab=paste("Chromosome",unique(d$chr),"position"))
         }else {
                 plot(d$pos,d$logp, ylim=c(ymin,ymax), ylab=expression(-log[10](italic(p))),
-                        xlab="Chromosome", xaxt="n", type="n")
-                axis(1, at=ticks, lab=unique(d$chr))
-
+                        xlab="", xaxt="n", type="n")
+				mtext(text = "Chromosome",
+      				side = 1,
+      				line = 4)
+			axis(1, at=ticks, lab=unique(d$chr))
 				if (23 %in% chr){ 
                 	axis(1, at=ticks2, line=2.5,tick=T,lab=rep("",2),lwd.ticks=0)
 					axis(1, at=(as.numeric(ticks2[1])+as.numeric(ticks2[2]))/2, lab=c("X"),line=2,tick=F)
+
 				}
 
                 icol=1
@@ -181,9 +182,6 @@ manhattan <- function(dataframe, colors=c("lightsteelblue4","lightyellow2"),
 }
 
 ################################################################################################################
-
-#.libPaths("/gpfs/projects/bsc05/ramon/R_libs")
-
 library(gap)
 library(sfsmisc)
 
@@ -203,8 +201,9 @@ library(sfsmisc)
 
     tab_file_data <- tab_file_data[tab_file_data[,col_number]!=0,]
     tab_file_data <- tab_file_data[!is.na(tab_file_data[,col_number]),]
+	tab_file_data_qq <- tab_file_data[tab_file_data$chr!="23_males" & tab_file_data$chr!="23_females",] 
 
-    p <- tab_file_data[,col_number]
+    p <- tab_file_data_qq[,col_number]
     p <- p[!is.na(p)]
     n <- length(p)
     x2obs <- qchisq(p, 1, lower.tail = FALSE)
@@ -215,16 +214,18 @@ library(sfsmisc)
         qq.plot(tab_file_data, lambda=F, stat="pvalue" ,scale.cex=T);
 
     dev.off()
-    tiff(out_qqplot_tiff,width=5600,height=5600,units = "px", res = 800,compression="lzw")
-            qq.plot(tab_file_data, lambda=F, stat="pvalue" ,scale.cex=T,mod=modal);
+    tiff(out_qqplot_tiff,width=5600,height=5600,units = "px", res = 800,compression="zip")
+            qq.plot(tab_file_data, lambda=F, stat="pvalue" ,scale.cex=T);
     dev.off()
     cat("Q-Q Plot Assoc successfully completed!\n")
     
     #make Manhattan on pdf
 
     tab_file_data$chr <- as.character(tab_file_data$chr)
+    tab_file_data$chr[tab_file_data$chr=="23"] <- as.character("25")
     tab_file_data$chr[tab_file_data$chr=="23_females"] <- as.character("23")
     tab_file_data$chr[tab_file_data$chr=="23_males"] <- as.character("24")
+
     tab_file_data$chr <- as.numeric(tab_file_data$chr)
 
     tab_file_data$SNP <- paste(paste("chr",tab_file_data$chr,sep=""),tab_file_data$position,sep=":")
@@ -240,12 +241,12 @@ library(sfsmisc)
     YMIN <- 0
     YMAX <- "max"
 
-    pdf(out_manhattan,width=14,height=7.5)
-        manhattan(tab_man, pch=16,cex=0.70,main=title,colors=c("lightsteelblue4","ivory3"), suggestiveline=-log10(pval_threshold), ymax=YMAX, ymin=YMIN)
+    pdf(out_manhattan,width=24,height=14.5)
+        manhattan(tab_man, pch=16,cex=0.7,main=title,colors=c("lightsteelblue4","ivory3"), suggestiveline=-log10(pval_threshold), ymax=YMAX, ymin=YMIN)
     dev.off()
 
     #make Manhattan on tiff
-    tiff(out_manhattan_tiff,width=9600,height=5600,units = "px", res = 800,compression="lzw")
+    tiff(out_manhattan_tiff,width=27,height=17.5,units = "in", res = 800,compression="zip")
         manhattan(tab_man, pch=16,cex=0.70,main=title,colors=c("lightsteelblue4","ivory3"), suggestiveline=-log10(pval_threshold), ymax=YMAX, ymin=YMIN)
     dev.off()
 
