@@ -26,28 +26,32 @@ usage() {
 Usage: $0 [options]
 
   * Options:
-    -v                                 Display version
-    -h                                 Display help message
+    -v                                        Display version
+    -h                                        Display help message
 
-    --help                             Display help message
-    --version                          Display version
+    --help                                    Display help message
+    --version                                 Display version
 
-    --backend=<backend>                Set cloud backend
-                                       Default: ${DEFAULT_CLOUD_BACKEND}
-    --props=<filename>                 Loads variables from properties file
+    --backend=<backend>                       Set cloud backend
+                                              Default: ${DEFAULT_CLOUD_BACKEND}
+    --props=<filename>                        Loads variables from properties file
 
-    --username=<string>                Sets username variable
-    --public_ssh_file=<file>           Sets public ssh file
-    --project_name=<string>            Sets project name
-    --identification_json=<file>       Sets identification JSON file
-    --base_instance_name=<string>      Sets base instance name
-    --override_instance=<boolean>      When activated, overrides the base instance
-    --bucket_name=<string>             Sets the bucket name
-    --snapshot_name=<string>           Sets the snapshot name
-    --cluster_instance_name=<string>   Sets the cluster images name
-    --node_mem=<string>                Memory size per node <standard, highmem, highcpu>
-    --node_cpus=<int>                  Number of CPUs per node
-    --num_nodes=<int>                  Number of nodes for the cluster
+    --username=<string>                       Sets username variable
+    --public_ssh_file=<file>                  Sets public ssh file
+    --project_name=<string>                   Sets project name
+    --identification_json=<file>              Sets identification JSON file
+    --base_instance_name_master=<string>      Sets base instance name for the master
+    --base_instance_name_worker=<string>      Sets base instance name for the workers
+    --override_instance=<boolean>             When activated, overrides the base instance
+    --bucket_name=<string>                    Sets the bucket name
+    --snapshot_name_master=<string>           Sets the snapshot name for the master
+    --snapshot_name_worker=<string>           Sets the snapshot name for the workers
+    --disk_size_master=<int>                  Sets the disk size for the master
+    --disk_size_worker=<int>                  Sets the disk size for the workers
+    --cluster_instance_name=<string>          Sets the cluster images name
+    --node_mem=<string>                       Memory size per node <standard, highmem, highcpu>
+    --node_cpus=<int>                         Number of CPUs per node
+    --num_nodes=<int>                         Number of nodes for the cluster
 
 EOT
 }
@@ -102,8 +106,11 @@ get_args() {
           identification_json=*)
             IDENTIFICATION_JSON=${OPTARG//identification_json=/}
             ;;
-          base_instance_name=*)
-            BASE_INSTANCE_NAME=${OPTARG//base_instance_name=/}
+          base_instance_name_master=*)
+            BASE_INSTANCE_NAME_MASTER=${OPTARG//base_instance_name_master=/}
+            ;;
+          base_instance_name_worker=*)
+            BASE_INSTANCE_NAME_WORKER=${OPTARG//base_instance_name_worker=/}
             ;;
           override_instance=*)
             OVERRIDE_INSTANCE=${OPTARG//override_instance=/}
@@ -111,8 +118,17 @@ get_args() {
           bucket_name=*)
             BUCKET_NAME=${OPTARG//bucket_name=/}
             ;;
-          snapshot_name=*)
-            SNAPSHOT_NAME=${OPTARG//snapshot_name=/}
+          snapshot_name_master=*)
+            SNAPSHOT_NAME_MASTER=${OPTARG//snapshot_name_master=/}
+            ;;
+          snapshot_name_worker=*)
+            SNAPSHOT_NAME_WORKER=${OPTARG//snapshot_name_worker=/}
+            ;;
+          disk_size_master=*)
+            MASTER_DISK=${OPTARG//disk_size_master=/}
+            ;;
+          disk_size_worker=*)
+            WORKER_DISK=${OPTARG//disk_size_worker=/}
             ;;
           cluster_instance_name=*)
             CLUSTER_INSTANCE_NAME=${OPTARG//cluster_instance_name=/}
@@ -183,8 +199,13 @@ check_args() {
     exit 1
   fi
   
-  if [ -z "${BASE_INSTANCE_NAME}" ]; then
-    echo "[ERROR] BASE_INSTANCE_NAME not defined"
+  if [ -z "${BASE_INSTANCE_NAME_MASTER}" ]; then
+    echo "[ERROR] BASE_INSTANCE_NAME_MASTER not defined"
+    exit 1
+  fi
+
+    if [ -z "${BASE_INSTANCE_NAME_WORKER}" ]; then
+    echo "[ERROR] BASE_INSTANCE_NAME_WORKER not defined"
     exit 1
   fi
   
@@ -198,8 +219,23 @@ check_args() {
     exit 1
   fi
   
-  if [ -z "${SNAPSHOT_NAME}" ]; then
-    echo "[ERROR] SNAPSHOT_NAME not defined"
+  if [ -z "${SNAPSHOT_NAME_MASTER}" ]; then
+    echo "[ERROR] SNAPSHOT_NAME_MASTER not defined"
+    exit 1
+  fi
+
+    if [ -z "${SNAPSHOT_NAME_WORKER}" ]; then
+    echo "[ERROR] SNAPSHOT_NAME_WORKER not defined"
+    exit 1
+  fi
+
+  if [ -z "${MASTER_DISK}" ]; then
+    echo "[ERROR] MASTER_DISK not defined"
+    exit 1
+  fi
+
+  if [ -z "${WORKER_DISK}" ]; then
+    echo "[ERROR] WORKER_DISK not defined"
     exit 1
   fi
 
@@ -263,14 +299,20 @@ IDENTIFICATION_JSON=${IDENTIFICATION_JSON}
 BACKEND_SCRIPT=${BACKEND_SCRIPT}
 
 # Base instance information
-BASE_INSTANCE_NAME=${BASE_INSTANCE_NAME}
+BASE_INSTANCE_NAME_MASTER=${BASE_INSTANCE_NAME_MASTER}
+BASE_INSTANCE_NAME_WORKER=${BASE_INSTANCE_NAME_WORKER}
 OVERRIDE_INSTANCE=${OVERRIDE_INSTANCE}
 
 # Bucket information
 BUCKET_NAME=${BUCKET_NAME}
 
 # Snapshot name
-SNAPSHOT_NAME=${SNAPSHOT_NAME}
+SNAPSHOT_NAME_MASTER=${SNAPSHOT_NAME_MASTER}
+SNAPSHOT_NAME_WORKER=${SNAPSHOT_NAME_WORKER}
+
+# Disk sizes
+MASTER_DISK=${MASTER_DISK}
+WORKER_DISK=${WORKER_DISK}
 
 # Cluster information
 CLUSTER_INSTANCE_NAME=${CLUSTER_INSTANCE_NAME}

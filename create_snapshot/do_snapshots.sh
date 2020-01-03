@@ -53,7 +53,7 @@ check_and_load_args() {
   # NODE_TYPE
   # NUM_NODES
 
-  # shellcheck source=../utils/create_base_instance.sh
+  # shellcheck source=../utils/create_base_instances.sh
   # shellcheck disable=SC1091
   source "${BACKEND_SCRIPT}"
   # initSession
@@ -77,8 +77,9 @@ check_and_load_args() {
 }
 
 do_snapshot() {
-  echo "[INFO] Performing instance snapshot..."
-  doSnapshot "${BASE_INSTANCE_NAME}" "${SNAPSHOT_NAME}"
+  echo "[INFO] Performing instance snapshots..."
+  doSnapshot "${BASE_INSTANCE_NAME_MASTER}" "${SNAPSHOT_NAME_MASTER}"
+  doSnapshot "${BASE_INSTANCE_NAME_WORKER}" "${SNAPSHOT_NAME_WORKER}"
   echo "[INFO] Snapshot DONE"
 }
 

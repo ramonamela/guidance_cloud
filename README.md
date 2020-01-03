@@ -27,6 +27,28 @@ Utils to configure Guidance and COMPSs in a cloud environment.
 ./create_cluster.sh -h
 ```
 
+### Create snapshot
+Before launching any execution, the snapshots that will serve as base to create the cluster master and workers need to be created. The most important information supplied in this step is the available amount of space in the disk both in the master and worker nodes.
+Once this variables have been correctly set, launching the command as follows will create both snapshots:
+
+```bash
+./create_snapshot.sh --props=production.props
+```
+
+It is possible to store as many property files as wanted. They must be placed in the ```props``` folder.
+
+<details><summary>Show snapshot properties description</summary>
+
+<p>
+
+
+
+</p>
+</details>
+
+### Create cluster
+Once the snapshots have been created (the same snapshot can serve as base for several runs) a cluster with the amount of requested nodes can be created in order to launch a COMPSs execution.  
+
 ## Contributing
 
 All kinds of contributions are welcome. Please do not hesitate to open a new issue,

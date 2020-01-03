@@ -53,7 +53,7 @@ check_and_load_args() {
   # NODE_TYPE
   # NUM_NODES
 
-  # shellcheck source=../utils/create_base_instance.sh
+  # shellcheck source=../utils/create_base_instances.sh
   # shellcheck disable=SC1091
   source "${BACKEND_SCRIPT}"
   # initSession

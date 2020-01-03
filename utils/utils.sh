@@ -223,7 +223,7 @@ installGuidanceDependenciesCommands() {
   cd
   sudo -E apt-get update
   sudo -E apt-get install -y --no-install-recommends maven
-  git clone --branch 0.1.1 "https://github.com/ramonamela/guidance.git" guidance
+  git clone "https://github.com/ramonamela/guidance.git" guidance
   pushd guidance
   mvn clean install
   cp guidance.jar "${HOME}"

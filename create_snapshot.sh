@@ -61,11 +61,11 @@ main() {
   create_internal_props_file "${internal_props_file}"
 
   # Launch backend script
-  echo "[INFO] Creating base instance..."
-  "${SCRIPT_DIR}"/create_snapshot/create_base_instance.sh "${internal_props_file}"
+  echo "[INFO] Creating base instances..."
+  "${SCRIPT_DIR}"/create_snapshot/create_base_instances.sh "${internal_props_file}"
 
-  echo "[INFO] Creating snapshot..."
-  "${SCRIPT_DIR}"/create_snapshot/do_snapshot.sh "${internal_props_file}"
+  echo "[INFO] Creating snapshots..."
+  "${SCRIPT_DIR}"/create_snapshot/do_snapshots.sh "${internal_props_file}"
 
   echo "DONE"
 }

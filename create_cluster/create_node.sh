@@ -22,14 +22,15 @@ SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
 #
 
 get_args() {
-  if [ $# -ne 2 ]; then
+  if [ $# -ne 3 ]; then
     echo "[ERROR] Incorrect number of parameters"
     echo "  Usage: $0 <internal_props_file> <node_id>"
     exit 1
   fi
 
   internal_props_file=$1
-  node_id=$2
+  current_name=$2
+  snapshot_name=$3
 }
 
 check_and_load_args() {
@@ -56,7 +57,7 @@ check_and_load_args() {
   # NODE_TYPE
   # NUM_NODES
 
-  # shellcheck source=../utils/create_base_instance.sh
+  # shellcheck source=../utils/create_base_instances.sh
   # shellcheck disable=SC1091
   source "${BACKEND_SCRIPT}"
   # initSession
@@ -80,55 +81,53 @@ check_and_load_args() {
 }
 
 create_node() {
-  echo "[INFO][${node_id}] Creating new node with id = ${node_id}"
+  echo "[INFO][${current_name}] Creating new node with id = ${current_name}"
 
   local service_account
   local current_zone
-  local current_name
 
-  service_account=$(getServiceAccount "${BASE_INSTANCE_NAME}")
+  service_account=$(getServiceAccount "${BASE_INSTANCE_NAME_MASTER}")
   current_zone=$(getBucketZone "${BUCKET_NAME}") # "us-east1-c"
-  current_name="${CLUSTER_INSTANCE_NAME}$(printf %04d "${node_id}")"
 
   # Clean previous instances (if any)
-  echo "[INFO][${node_id}] Cleaning previous instance and disks"
+  echo "[INFO][${current_name}] Cleaning previous instance and disks"
   removeInstance "${current_name}"
   removeDisk "${current_name}" "${current_zone}"
 
   # Create new disks, instance, and SSH keys
-  echo "[INFO][${node_id}] Creating new disks"
-  createDisk "${current_name}" "${SNAPSHOT_NAME}" "${current_zone}"
+  echo "[INFO][${current_name}] Creating new disks"
+  createDisk "${current_name}" "${snapshot_name}" "${current_zone}"
 
-  echo "[INFO][${node_id}] Creating new instance"
+  echo "[INFO][${current_name}] Creating new instance"
   createInstance "${current_name}" "${current_zone}" "${NODE_TYPE}" "${service_account}"
 
-  echo "[INFO][${node_id}] Adding SSH keys"
+  echo "[INFO][${current_name}] Adding SSH keys"
   addPublicKey "${current_name}" "${current_zone}" "${USERNAME}" "${PUBLIC_SSH_FILE}"
 
   # Wait until the image is running
-  echo "[INFO][${node_id}] Waiting until the image is running..."
+  echo "[INFO][${current_name}] Waiting until the image is running..."
   waitUntilRunning "${current_name}" "${current_zone}" "${USERNAME}"
   current_ip=$(getIP "${current_name}" "${current_zone}")
-  echo "[INFO][${node_id}] Image running"
+  echo "[INFO][${current_name}] Image running"
 
   # Add private/public ssh key
   scp -o "StrictHostKeyChecking no" "${PUBLIC_SSH_FILE}" "${USERNAME}"@"${current_ip}":~/.ssh/
   scp -o "StrictHostKeyChecking no" "${PUBLIC_SSH_FILE::-4}" "${USERNAME}"@"${current_ip}":~/.ssh/
 
   # Mount disks
-  echo "[INFO][${node_id}] Mounting disks"
+  echo "[INFO][${current_name}] Mounting disks"
   ssh -q -o "StrictHostKeyChecking no" "${USERNAME}"@"${current_ip}" "cat /etc/fuse.conf | grep -v user_allow_other > tmp.conf;echo user_allow_other >> tmp.conf;sudo mv tmp.conf /etc/fuse.conf"
   # shellcheck disable=SC2029
   while ! ssh -q -o "StrictHostKeyChecking no" "${USERNAME}"@"${current_ip}" "bash -s" -- < "${SCRIPT_DIR}"/mount_disk.sh "${BUCKET_NAME}"; do
-    echo "[INFO][${node_id}] Could not mount disks, retrying..."
+    echo "[INFO][${current_name}] Could not mount disks, retrying..."
     sleep 3s
   done
-  echo "[INFO][${node_id}] Disks mounted"
+  echo "[INFO][${current_name}] Disks mounted"
 
   # TODO: The mount script automount_fuse.sh should be injected to the /etc/init.d to have the fuse mounted between node restarts
 
   # DONE
-  echo "[INFO][${node_id}] Node ${node_id} DONE"
+  echo "[INFO][${current_name}] Node ${current_name} DONE"
 }
 
 

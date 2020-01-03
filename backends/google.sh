@@ -201,6 +201,7 @@ createBaseInstance() {
   local service_account=${2}
   local project_name=${3}
   local zone=${4}
+  local disk_size=${5}
 
   #local ubuntu_image="ubuntu-minimal-1810-cosmic-v20190628"
   local ubuntu_image="ubuntu-minimal-1804-bionic-v20190911"
@@ -213,7 +214,7 @@ createBaseInstance() {
     --image "${ubuntu_image}" \
     --image-project ubuntu-os-cloud \
     --boot-disk-type pd-standard \
-    --boot-disk-size 500GB \
+    --boot-disk-size "${disk_size}"GB \
     --boot-disk-device-name "${instance_name}" \
     --service-account "${service_account}"
 }

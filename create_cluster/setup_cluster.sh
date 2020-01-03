@@ -64,7 +64,7 @@ create_xml_files() {
   resources_file="${SCRIPT_DIR}/resources.xml"
   ${COMPSS_HOME}/Runtime/scripts/system/xmls/generate_resources.sh "${resources_file}" "${info}"
   #sed -i 's/<ResourcesList>/<ResourcesList><SharedDisk Name=\"Bucket\"><Storage><Size>1000000.0<\/Size><Type>Persistent<\/Type><\/Storage><\/SharedDisk>/g' "${resources_file}"
-  sed -i 's/<\/Processor>/<\/Processor><Memory><Size>'${mem}'<\/Size><\/Memory>/g' "${resources_file}"
+  sed -i 's@</Processor>@</Processor><Memory><Size>'${mem}'</Size></Memory>@g' "${resources_file}"
   #sed -i 's/<\/Adaptors>/<\/Adaptors><SharedDisks><AttachedDisk Name=\"Bucket\"><MountPoint>'${bucket_dir_for_sed}'<\/MountPoint><\/AttachedDisk><\/SharedDisks>/g' "${resources_file}"
   echo "[INFO] resources.xml generation DONE at ${resources_file}"
   # echo "[DEBUG] resources.xml content:"

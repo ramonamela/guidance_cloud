@@ -31,8 +31,10 @@ create_cluster() {
 
   # Launch create_node in parallel
   declare -a node_pids
-  for (( i=0; i<NUM_NODES; i++ )); do
-    "${SCRIPT_DIR}"/create_cluster/create_node.sh "${internal_props_file}" "${i}" &
+  "${SCRIPT_DIR}"/create_cluster/create_node.sh "${internal_props_file}" "${CLUSTER_INSTANCE_NAME}$(printf %04d 0)" "${SNAPSHOT_NAME_MASTER}" &
+  node_pids[0]=$!
+  for (( i=1; i<NUM_NODES; i++ )); do
+    "${SCRIPT_DIR}"/create_cluster/create_node.sh "${internal_props_file}" "${CLUSTER_INSTANCE_NAME}$(printf %04d "${i}")" "${SNAPSHOT_NAME_WORKER}" &
     node_pids[$i]=$!
   done
 
@@ -63,21 +65,27 @@ create_cluster() {
   fi
 }
 
-remove_cluster() {
+remove_workers() {
   # Launch remove_node in parallel
   declare -a remove_node_pids
-  for (( i=0; i<NUM_NODES; i++ )); do
+  for (( i=1; i<NUM_NODES; i++ )); do
     "${SCRIPT_DIR}"/create_cluster/remove_node.sh "${internal_props_file}" "${i}" &
     remove_node_pids[$i]=$!
   done
 
   # Wait for all
   local ev
-  for (( i=0; i<NUM_NODES; i++ )); do
+  for (( i=1; i<NUM_NODES; i++ )); do
     ev=0
     wait ${remove_node_pids[$i]} || ev=1
     echo "[INFO] Removing node $i finished with exit value = ${ev}"
   done
+}
+
+remove_cluster() {
+  # Launch remove_node in parallel
+  remove_workers
+  "${SCRIPT_DIR}"/create_cluster/remove_node.sh "${internal_props_file}" 0
 }
 
 setup_cluster() {

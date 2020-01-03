@@ -62,7 +62,7 @@ check_and_load_args() {
   # installGuidanceDependencies
   # installCOMPSs
   
-  # shellcheck source=../utils/create_base_instance.sh
+  # shellcheck source=../utils/create_base_instances.sh
   # shellcheck disable=SC1091
   source "${BACKEND_SCRIPT}"
   # initSession
@@ -86,26 +86,65 @@ check_and_load_args() {
 }
 
 do_new_base_instance() {
+  local base_instance_name=${1}
+  local base_instance_disk_size=${2}
   # Creates a new base instance
-  createBaseInstance "${BASE_INSTANCE_NAME}" "${service_account}" "${PROJECT_NAME}" "${bucket_zone}"
+  createBaseInstance "${base_instance_name}" "${service_account}" "${PROJECT_NAME}" "${bucket_zone}" "${base_instance_disk_size}" > /dev/null 2> /dev/null
   # Set up public key
-  addPublicKey "${BASE_INSTANCE_NAME}" "${bucket_zone}" "${USERNAME}" "${PUBLIC_SSH_FILE}"
+  addPublicKey "${base_instance_name}" "${bucket_zone}" "${USERNAME}" "${PUBLIC_SSH_FILE}" > /dev/null 2> /dev/null
   # Wait until instance is running
-  zone=$(getInstanceZone "${BASE_INSTANCE_NAME}")
-  waitUntilRunning "${BASE_INSTANCE_NAME}" "${zone}" "${USERNAME}"
+  zone=$(getInstanceZone "${base_instance_name}")
+  waitUntilRunning "${base_instance_name}" "${zone}" "${USERNAME}" > /dev/null 2> /dev/null
   # WARN: Setting global variable CURRENT_IP !!!!
-  CURRENT_IP=$(getIP "${BASE_INSTANCE_NAME}" "${zone}")
+  echo $(getIP "${base_instance_name}" "${zone}")
+}
+
+prepare_instance() {
+  local current_instance_name=${1}
+  local current_ip=${2}
+
+  # Installing basic dependencies
+  echo "[INFO] Installing basic dependencies..."
+  installBasicDependencies "${USERNAME}" "${current_ip}"
+
+  # Mount FUSE
+  # This is done in order to mount a FUSE system on the bucket
+  # Look into GCSFuse and https://github.com/s3fs-fuse/s3fs-fuse/wiki/Fuse-Over-Amazon
+  echo "[INFO] Mounting FUSE..."
+  ssh -q -o "StrictHostKeyChecking no" "${USERNAME}"@"${current_ip}" "cat /etc/fuse.conf | grep -v user_allow_other > tmp.conf;echo user_allow_other >> tmp.conf;sudo mv tmp.conf /etc/fuse.conf"
+
+  # Install execution environment
+  scp -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/../execution/env.sh "${USERNAME}"@"${current_ip}":.
+  scp -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/../execution/env_execution.sh "${USERNAME}"@"${current_ip}":.
+
+  # Install Guidance dependencies
+  echo "[INFO] Install Guidance dependencies..."
+  installGuidanceDependencies "${USERNAME}" "${current_ip}"
+
+  # Install COMPSs
+  echo "[INFO] Install COMPSs..."
+  installCOMPSs "${USERNAME}" "${current_ip}"
+
+  # Stopping instance
+  echo "[INFO] Stopping instance..."
+  stopInstance "${current_instance_name}"
+
+  echo "[INFO] BaseImage DONE"
+
 }
 
 create_base_instance() {
+  local base_instance_name=${1}
+  local base_instance_disk_size=${2}
+
   # Initialize backend session
   echo "[INFO] Initializing session backend..."
   initSession "${IDENTIFICATION_JSON}"
-  
+
   # Set project name
   echo "[INFO] Setting project name in backend..."
   setProjectName "${PROJECT_NAME}"
-  
+
   # Retrieve basic information
   echo "[INFO] Retrieving basic information..."
   local bucket_location
@@ -114,54 +153,27 @@ create_base_instance() {
   bucket_location=$(getBucketLocation "${BUCKET_NAME}")
   bucket_zone=$(getBucketZone "${BUCKET_NAME}")
   service_account=$(getServiceAccountFromJSON "${IDENTIFICATION_JSON}")
-  
+
   # Set project properties
   echo "[INFO] Setting cloud project properties..."
   setProjectProperties "${bucket_location}"
-  
-  # Create instance
+
+  # Create instances
   echo "[INFO] Creating instance..."
   if [ "${OVERRIDE_INSTANCE}" = "true" ]; then
-    removeInstance "${BASE_INSTANCE_NAME}"
-    do_new_base_instance
+    removeInstance "${base_instance_name}"
+    current_ip=$(do_new_base_instance "${base_instance_name}" "${base_instance_disk_size}")
   else
     local ie
-    ie=$(checkInstanceExistance "${BASE_INSTANCE_NAME}")
+    ie=$(checkInstanceExistance "${base_instance_name}")
     if [ "0" -eq "${ie}" ]; then
-      echo "[WARN] Creating snapshot from existing instance"
+      echo "[WARN] Creating ${base_instance_name} snapshot from existing instance"
       echo "[WARN] Set the configuration 'override' parameter to \"true\" in order to generate the instance again"
     else
-      do_new_base_instance
+      current_ip=$(do_new_base_instance "${base_instance_name}" "${base_instance_disk_size}")
     fi
   fi
-
-  # Installing basic dependencies
-  echo "[INFO] Installing basic dependencies..."
-  installBasicDependencies "${USERNAME}" "${CURRENT_IP}"
-  
-  # Mount FUSE
-  # This is done in order to mount a FUSE system on the bucket
-  # Look into GCSFuse and https://github.com/s3fs-fuse/s3fs-fuse/wiki/Fuse-Over-Amazon
-  echo "[INFO] Mounting FUSE..."
-  ssh -q -o "StrictHostKeyChecking no" "${USERNAME}"@"${CURRENT_IP}" "cat /etc/fuse.conf | grep -v user_allow_other > tmp.conf;echo user_allow_other >> tmp.conf;sudo mv tmp.conf /etc/fuse.conf"
-
-  # Install execution environment
-  scp -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/../execution/env.sh "${USERNAME}"@"${CURRENT_IP}":.
-  scp -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/../execution/env_execution.sh "${USERNAME}"@"${CURRENT_IP}":.
-  
-  # Install Guidance dependencies
-  echo "[INFO] Install Guidance dependencies..."
-  installGuidanceDependencies "${USERNAME}" "${CURRENT_IP}"
-  
-  # Install COMPSs
-  echo "[INFO] Install COMPSs..."
-  installCOMPSs "${USERNAME}" "${CURRENT_IP}"
-
-  # Stopping instance
-  echo "[INFO] Stopping instance..."
-  stopInstance "${BASE_INSTANCE_NAME}"
-  
-  echo "[INFO] BaseImage DONE"
+  prepare_instance "${base_instance_name}" "${current_ip}"
 }
 
 #
@@ -176,7 +188,8 @@ main() {
   check_and_load_args
 
   # Create node
-  create_base_instance
+  create_base_instance "${BASE_INSTANCE_NAME_MASTER}" "${MASTER_DISK}"
+  create_base_instance "${BASE_INSTANCE_NAME_WORKER}" "${WORKER_DISK}"
 }
 
 
