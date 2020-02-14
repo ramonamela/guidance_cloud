@@ -218,6 +218,7 @@ createBaseInstance() {
     --service-account "${service_account}"
 }
 
+# Creates a base instance for the cluster
 createInstance() {
   local instance_name=$1
   local zone=$2
@@ -230,6 +231,18 @@ createInstance() {
     --service-account "${service_account}" \
     --disk "name=${instance_name},device-name=${instance_name},mode=rw,boot=yes,auto-delete=yes" \
     --scopes="storage-full"
+}
+
+# Gets the amount of memory per CPU of a given type of node
+getMemory() {
+	local node_type=$1
+  if [ "${NODE_MEM}" == "standard" ]; then
+    echo 3
+  elif [ "${NODE_MEM}" == "highmem" ]; then
+		echo 6
+	elif [ "${NODE_MEM}" == "highcpu" ]; then
+		echo 1
+	fi
 }
 
 # Stops a running instance

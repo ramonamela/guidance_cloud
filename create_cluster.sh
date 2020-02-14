@@ -97,7 +97,8 @@ setup_cluster() {
   done
 
   # Configure master
-  local mem="26"
+  local mem_per_cpu=$(getMemory ${NODE_MEM})
+	local mem=$((${NODE_CPUS} * ${mem_per_cpu}))
   local bucket_dir="/home/${USERNAME}/${BUCKET_NAME}/tmpForCOMPSs"
   local bucket_dir="/tmp"
   scp -o "StrictHostKeyChecking no" "${SCRIPT_DIR}"/create_cluster/setup_cluster.sh "${USERNAME}"@"${master_ip}":.
@@ -226,6 +227,27 @@ main() {
   # Create props file
   internal_props_file=$(mktemp)
   create_internal_props_file "${internal_props_file}"
+
+  source "${BACKEND_SCRIPT}"
+  # initSession
+  # setProjectName
+  # setProjectProperties
+  # getBucketLocation
+  # getBucketZone
+  # getServiceAccount
+  # addPublicKey
+  # waitUntilRunning
+  # getIP
+  # createDisk
+  # removeDisk
+  # checkInstanceExistance
+  # getInstanceZone
+  # createBaseInstance
+  # createInstance
+  # getMemory
+  # stopInstance
+  # removeInstance
+  # doSnapshot
 
   # Create cluster
   global_ev=0

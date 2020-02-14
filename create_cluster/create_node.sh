@@ -74,6 +74,7 @@ check_and_load_args() {
   # getInstanceZone
   # createBaseInstance
   # createInstance
+  # getMemory
   # stopInstance
   # removeInstance
   # doSnapshot

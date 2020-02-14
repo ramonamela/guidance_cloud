@@ -2,34 +2,34 @@
 
 ### PHASE 1 ###
 
-export phasingMem="100.0"
+export phasingMem="13.0"
 export phasingCU="2"
 
-export phasingBedMem="100.0"
+export phasingBedMem="13.0"
 export phasingBedCU="2"
 
 
 ### PHASE 2 ###
 
-export qctoolMem="12.0"
+export qctoolMem="6.0"
 
 export qctoolSMem="1.0"
 
-export gtoolsMem="12.0"
+export gtoolsMem="6.0"
 
-export samtoolsBgzipMem="12.0"
+export samtoolsBgzipMem="6.0"
 
-export imputeWithImputeLowMem="12.0"
-export imputeWithImputeMediumMem="12.0"
-export imputeWithImputeHighMem="12.0"
+export imputeWithImputeLowMem="6.0"
+export imputeWithImputeMediumMem="6.0"
+export imputeWithImputeHighMem="6.0"
 
 export imputeWithMinimacLowMem="6.0"
 export imputeWithMinimacMediumMem="6.0"
 export imputeWithMinimacHighMem="6.0"
 
-export filterByInfoImputeMem="12.0"
+export filterByInfoImputeMem="6.0"
 
-export filterByInfoMinimacMem="12.0"
+export filterByInfoMinimacMem="6.0"
 
 ### PHASE 3 ###
 
@@ -65,10 +65,10 @@ export combinePanelsComplex1Mem="1.0"
 
 export generateCondensedTopHitsCU="2"
 
-export generateCondensedTopHitsMem="50.0"
+export generateCondensedTopHitsMem="13.0"
 
 export generateQQManhattanPlotsCU="2"
 
-export generateQQManhattanPlotsMem="50.0"
+export generateQQManhattanPlotsMem="13.0"
 
 export phenoMergeMem="13.0"

@@ -27,6 +27,8 @@ run() {
   cfg_file="/home/computational.genomics.bsc/guidance_bucket/config_GERA_1000_shapeit_impute_1_23_cloud.file"
   output_dir=$(cat ${cfg_file} | grep outputdir | awk '{ print $3 }')
 	mkdir -p ${output_dir}
+  
+  source /home/computational.genomics.bsc/env_execution.sh
 
   debug=off #debug
   graph=true
