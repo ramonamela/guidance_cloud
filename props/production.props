@@ -1,0 +1,22 @@
+## General project information
+USERNAME="computational.genomics.bsc"
+PUBLIC_SSH_FILE="${HOME}/.ssh/id_rsa.pub"
+PROJECT_NAME="guidance"
+IDENTIFICATION_JSON="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )/../guidance-252716-784e2a010688.json"
+
+## Base instance information
+BASE_INSTANCE_NAME="guidancebase"
+OVERRIDE_INSTANCE="true"
+
+## Bucket information
+#BUCKET_NAME="bucket-${PROJECT_NAME}"
+BUCKET_NAME="guidance_bucket"
+
+## Snapshot name
+SNAPSHOT_NAME="snap${PROJECT_NAME}"
+
+## Cluster options
+CLUSTER_INSTANCE_NAME="guidancecluster"
+NODE_MEM="standard"  # standard, highmem, highcpu
+NODE_CPUS=64
+NUM_NODES=8

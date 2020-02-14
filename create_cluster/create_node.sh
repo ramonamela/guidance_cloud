@@ -86,7 +86,8 @@ create_node() {
   local current_zone
   local current_name
 
-  service_account=$(getServiceAccount "${BASE_INSTANCE_NAME}")
+  #service_account=$(getServiceAccount "${BASE_INSTANCE_NAME}")
+	service_account=$(getServiceAccountFromJSON "${IDENTIFICATION_JSON}")
   current_zone=$(getBucketZone "${BUCKET_NAME}") # "us-east1-c"
   current_name="${CLUSTER_INSTANCE_NAME}$(printf %04d "${node_id}")"
 

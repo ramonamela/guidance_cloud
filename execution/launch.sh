@@ -24,7 +24,7 @@ SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
 
 run() {
   jar_file="${HOME}"/guidance.jar
-  cfg_file="/home/computational.genomics.bsc/bucket-computational-genomics/config_GERA_300_shapeit_impute_20_23_cloud.file"
+  cfg_file="/home/computational.genomics.bsc/guidance_bucket/config_GERA_1000_shapeit_impute_1_23_cloud.file"
 
   debug=off #debug
   graph=true

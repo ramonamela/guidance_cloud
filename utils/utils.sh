@@ -273,7 +273,7 @@ EOF
   # Download COMPSs
   sudo rm -rf "${compss_path}"
   cd "$HOME"
-  git clone --branch "${compss_version}" https://github.com/bsc-wdc/compss.git
+  git clone --branch "${compss_version}" https://github.com/ramonamela/compss.git
   cd "${compss_path}"
   ./submodules_get.sh
   ./submodules_patch.sh

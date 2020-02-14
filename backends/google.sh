@@ -39,7 +39,7 @@ setProjectProperties() {
   local bucket_location=${1}
 
   local avail_zone
-  avail_zone=$(gcloud compute zones list | grep "${bucket_location}" | grep UP | awk '{ print $1 }' | head -n1)
+  avail_zone=$(gcloud compute zones list | grep "${bucket_location}" | grep UP | awk '{ print $1 }' | sort | head -n1)
   gcloud config set compute/zone "${avail_zone}"
 }
 
