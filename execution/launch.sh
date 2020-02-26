@@ -31,8 +31,8 @@ run() {
   source /home/computational.genomics.bsc/env_execution.sh
 
   debug=off #debug
-  graph=true
-  tracing=true
+  graph=false
+  tracing=false
 
   /opt/COMPSs/Runtime/scripts/user/runcompss \
     --log_level=${debug} \
