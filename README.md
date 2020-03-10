@@ -14,6 +14,7 @@ Utils to configure Guidance and COMPSs in a cloud environment.
 ## Table of Contents
 
 * [Commands](#commands)
+* [Executing GUIDANCE](#exec)
 * [Contributing](#contributing)
 * [Disclaimer](#disclaimer)
 * [License](#license)
@@ -42,7 +43,7 @@ It is possible to store as many property files as wanted. They must be placed in
 Once the snapshots have been created (the same snapshot can serve as base for several runs) a cluster with the amount of requested nodes can be created in order to launch a COMPSs execution.
 
 ```bash
-./create_snapshot.sh --props=production.props
+./create_cluster.sh --props=production.props
 ```
 
 ### Configuration file
@@ -83,6 +84,26 @@ The second block specifies the name of the base instance that will be created in
 
 </p>
 </details>
+
+## Execution
+
+Once the cluster has been created, the following actions must be performed:
+
+* Copy all the necessary files to the cluster
+* Copy the configuration file to the cluster
+* SSH into the master machine and execute the file `launch.sh` and wait until the execution finishes
+* Copy all the files that need to be stored into the bucket or any other persistent disk
+* Destroy the cluster through the Google Cloud's console
+
+### Offline execution
+
+With the previous instruction, GUIDANCE is launched directly in a console that should remain open during the whole execution. Nevertheless, in order to be able to shut down the local machine, the next command could be used:
+
+```
+ssh user@{master_ip} "/home/user/launch.sh > /home/user/output.txt 2> error.txt &"&
+```
+
+This way, the output is stored in the supplied file instead of the console. This enables shutting down the local machine at the same time that it is possible to check the progress of the execution.
 
 ## Contributing
 
