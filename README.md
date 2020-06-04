@@ -7,7 +7,7 @@
 
 # Cloud Utils
 
-Utils to configure Guidance and COMPSs in a cloud environment.
+Utils to configure Guidance and COMPSs in a cloud environment. In order to view the general excution intructions, go to the main [GUIDANCE repository](https://github.com/ramonamela/guidance.git)
 
 ---
 
